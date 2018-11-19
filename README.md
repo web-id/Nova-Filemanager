@@ -35,7 +35,7 @@ public function tools()
 {
     return [
         // ...
-        new \Infinety\Filemanager\FilemanagerTool(),
+        new \WebId\Filemanager\FilemanagerTool(),
     ];
 }
 ```
@@ -55,7 +55,7 @@ Click on the "FileManager" menu item in your Nova app to see the Filemanager Too
 ### Field Usage
 
 ```php
-use Infinety\Filemanager\FilemanagerField;
+use WebId\Filemanager\FilemanagerField;
 
 FilemanagerField::make('field');
 

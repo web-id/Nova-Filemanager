@@ -1,6 +1,6 @@
 <?php
 
-namespace Infinety\Filemanager;
+namespace WebId\Filemanager;
 
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool as BaseTool;

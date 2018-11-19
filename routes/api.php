@@ -12,11 +12,11 @@ use Illuminate\Support\Facades\Route;
 | by your tool's "Authorize" middleware by default. Now, go build!
 |
  */
-Route::get('data', \Infinety\Filemanager\Http\Controllers\FilemanagerToolController::class.'@getData');
-Route::post('actions/create-folder', \Infinety\Filemanager\Http\Controllers\FilemanagerToolController::class.'@createFolder');
-Route::post('actions/delete-folder', \Infinety\Filemanager\Http\Controllers\FilemanagerToolController::class.'@deleteFolder');
-Route::post('actions/get-info', \Infinety\Filemanager\Http\Controllers\FilemanagerToolController::class.'@getInfo');
-Route::post('actions/remove-file', \Infinety\Filemanager\Http\Controllers\FilemanagerToolController::class.'@removeFile');
+Route::get('data', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@getData');
+Route::post('actions/create-folder', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@createFolder');
+Route::post('actions/delete-folder', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@deleteFolder');
+Route::post('actions/get-info', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@getInfo');
+Route::post('actions/remove-file', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@removeFile');
 
-Route::post('uploads/add', \Infinety\Filemanager\Http\Controllers\FilemanagerToolController::class.'@upload');
-Route::get('uploads/update', \Infinety\Filemanager\Http\Controllers\FilemanagerToolController::class.'@updateFile');
+Route::post('uploads/add', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@upload');
+Route::get('uploads/update', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@updateFile');

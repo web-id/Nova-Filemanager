@@ -1,9 +1,9 @@
 <?php
 
-namespace Infinety\Filemanager;
+namespace WebId\Filemanager;
 
 use Laravel\Nova\Fields\Field;
-use Infinety\Filemanager\Http\Services\FileManagerService;
+use WebId\Filemanager\Http\Services\FileManagerService;
 
 class FilemanagerField extends Field
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Infinety\Filemanager\Http\Services;
+namespace WebId\Filemanager\Http\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;

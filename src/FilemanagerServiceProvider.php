@@ -1,12 +1,12 @@
 <?php
 
-namespace Infinety\Filemanager;
+namespace WebId\Filemanager;
 
 use Laravel\Nova\Nova;
 use Laravel\Nova\Events\ServingNova;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Infinety\Filemanager\Http\Middleware\Authorize;
+use WebId\Filemanager\Http\Middleware\Authorize;
 
 class FilemanagerServiceProvider extends ServiceProvider
 {

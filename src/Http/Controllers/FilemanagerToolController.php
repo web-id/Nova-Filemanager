@@ -1,10 +1,10 @@
 <?php
 
-namespace Infinety\Filemanager\Http\Controllers;
+namespace WebId\Filemanager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Infinety\Filemanager\Http\Services\FileManagerService;
+use WebId\Filemanager\Http\Services\FileManagerService;
 
 class FilemanagerToolController extends Controller
 {
