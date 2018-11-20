@@ -78,10 +78,52 @@ class FileManagerService
         if (! $filter) {
             $filter = false;
         }
-
         $files = $this->getFiles($folder, $order, $filter);
 
         return response()->json(['files' => $files, 'path' => $this->getPaths($folder)]);
+    }
+
+    /**
+     * Get ajax request to load files and folders from search.
+     *
+     * @param $search
+     * @return mixed
+     */
+    public function ajaxSearchFromAllFilesAndFolders($search)
+    {
+        $racineFiles = $this->getFiles('/', 'mime');
+        $files = $this->loopDirsForPopulateCollectOfFiles('/', $racineFiles, $search);
+
+        return response()->json(['files' => $files, 'path' => []]);
+    }
+
+    /**
+     * Loop on $baseUrl and return all files (include files on dir).
+     *
+     * @param $baseUrl
+     * @param $racineFiles
+     * @param bool $search
+     * @return mixed
+     */
+    public function loopDirsForPopulateCollectOfFiles($baseUrl, $racineFiles, $search = false)
+    {
+        $files = collect();
+        $racineFiles->each(function($file) use (&$files, $baseUrl, $search) {
+            if($file->type === "dir") {
+                $files = $files->merge(
+                    $this->loopDirsForPopulateCollectOfFiles($file->path, $this->getFiles($file->path, 'mime'), $search)
+                );
+            } else {
+                if($search) {
+                    if(strpos($file->name, $search) !== false) {
+                        $files->push($file);
+                    }
+                } else {
+                    $files->push($file);
+                }
+            }
+        });
+        return $files;
     }
 
     /**

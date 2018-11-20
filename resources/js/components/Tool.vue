@@ -25,7 +25,7 @@
                             {{ __('Create folder') }}
                         </button>
                     </div>
-                    <!-- <div class="w-1/3 flex flex-wrap justify-end">
+                    <div class="w-1/3 flex flex-wrap justify-end">
                         <div class="relative z-50 w-full max-w-xs">
                             <div class="relative">
                                 <div class="relative">
@@ -34,7 +34,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
 
                 <div class="flex flex-wrap">
@@ -151,6 +151,21 @@ export default {
             });
         },
 
+        getSearchData() {
+            this.files = [];
+            this.path = [];
+            this.noFiles = false;
+            this.loadingfiles = true;
+            return api.getSearchData(this.search).then(result => {
+                if (_.size(result.files) == 0) {
+                    this.noFiles = true;
+                }
+                this.files = result.files;
+                this.path = '/';
+                this.loadingfiles = false;
+            });
+        },
+
         showModalCreateFolder() {
             this.showCreateFolder = true;
         },
@@ -168,12 +183,14 @@ export default {
         },
 
         goToFolder(path) {
+            this.search = '';
             this.getData(path);
             this.currentPath = path;
             history.pushState(null, null, '?path=' + path);
         },
 
         goToFolderNav(path) {
+            this.search = '';
             this.getData(path);
             this.currentPath = path;
             if (this.currentPath == '/') {
@@ -224,6 +241,7 @@ export default {
 
         searchItems: _.debounce(function(e) {
             this.search = e.target.value;
+            this.getSearchData();
         }, 300),
     },
 

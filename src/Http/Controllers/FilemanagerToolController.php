@@ -30,6 +30,14 @@ class FilemanagerToolController extends Controller
     }
 
     /**
+     * @param \Illuminate\Http\Request $request
+     */
+    public function getSearchData(Request $request)
+    {
+        return $this->service->ajaxSearchFromAllFilesAndFolders($request->search);
+    }
+
+    /**
      * @param Request $request
      */
     public function createFolder(Request $request)

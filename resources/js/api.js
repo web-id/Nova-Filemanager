@@ -7,6 +7,12 @@ export default {
             .then(response => response.data);
     },
 
+    getSearchData(search) {
+        return window.axios
+            .get('/nova-vendor/infinety-es/nova-filemanager/data/' + search)
+            .then(response => response.data);
+    },
+
     uploadFile() {
         return window.axios
             .post('/nova-vendor/infinety-es/nova-filemanager/uploads/add')
