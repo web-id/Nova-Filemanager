@@ -18,7 +18,6 @@
                     <div class="flex flex-wrap">
                         <div class="card relative w-full">
 
-
                             <div class="p-3 flex items-center border-b border-50">
                                 <label class="manual_upload cursor-pointer">
                                     <div @click="showUpload = !showUpload" class="btn btn-default btn-primary mr-3">
@@ -43,8 +42,6 @@
                                 </div>
 
                             </div>
-
-                            
 				            
                             <manager 
                                 ref="manager"
@@ -205,6 +202,7 @@ export default {
     watch: {
         active: function(val) {
             if (val) {
+                this.search = '';
                 let currentUrl = new URI();
                 if (currentUrl.hasQuery('path')) {
                     let params = currentUrl.query(true);
