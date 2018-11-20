@@ -62396,6 +62396,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -62441,7 +62452,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             path: [],
             noFiles: false,
             filesToUpload: [],
-            firstTime: true
+            firstTime: true,
+            search: ''
         };
     },
 
@@ -62462,6 +62474,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 _this.loadingfiles = false;
             });
         },
+        getSearchData: function getSearchData() {
+            var _this2 = this;
+
+            this.files = [];
+            this.path = [];
+            this.noFiles = false;
+            this.loadingfiles = true;
+            return __WEBPACK_IMPORTED_MODULE_2__api__["a" /* default */].getSearchData(this.search).then(function (result) {
+                if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.size(result.files) == 0) {
+                    _this2.noFiles = true;
+                }
+                _this2.files = result.files;
+                _this2.path = '/';
+                _this2.loadingfiles = false;
+            });
+        },
         showModalCreateFolder: function showModalCreateFolder() {
             this.$emit('open-modal');
         },
@@ -62469,12 +62497,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.getData(this.currentPath);
         },
         goToFolder: function goToFolder(path) {
+            this.search = '';
             // this.currentPath = this.currentPath + '/' + path;
             this.getData(path);
             this.currentPath = path;
             // history.pushState(null, null, '?path=' + path);
         },
         goToFolderNav: function goToFolderNav(path) {
+            this.search = '';
             this.getData(path);
             this.currentPath = path;
             if (this.currentPath == '/') {
@@ -62498,7 +62528,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         uploadFiles: function uploadFiles(files) {
             this.$emit('uploadFiles', files);
-        }
+        },
+
+
+        searchItems: __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.debounce(function (e) {
+            this.search = e.target.value;
+            this.getSearchData();
+        }, 300)
     },
     watch: {
         active: function active(val) {
@@ -62899,6 +62935,82 @@ var render = function() {
                                     "\n                                " +
                                       _vm._s(_vm.__("Create folder")) +
                                       "\n                            "
+                                  )
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "div",
+                                { staticClass: "flex flex-wrap justify-end" },
+                                [
+                                  _c(
+                                    "div",
+                                    {
+                                      staticClass:
+                                        "relative z-50 w-full max-w-xs"
+                                    },
+                                    [
+                                      _c("div", { staticClass: "relative" }, [
+                                        _c("div", { staticClass: "relative" }, [
+                                          _c(
+                                            "svg",
+                                            {
+                                              staticClass:
+                                                "fill-current absolute search-icon-center ml-3 text-70",
+                                              attrs: {
+                                                xmlns:
+                                                  "http://www.w3.org/2000/svg",
+                                                width: "20",
+                                                height: "20",
+                                                viewBox: "0 0 20 20",
+                                                "aria-labelledby": "search",
+                                                role: "presentation"
+                                              }
+                                            },
+                                            [
+                                              _c("path", {
+                                                attrs: {
+                                                  "fill-rule": "nonzero",
+                                                  d:
+                                                    "M14.32 12.906l5.387 5.387a1 1 0 0 1-1.414 1.414l-5.387-5.387a8 8 0 1 1 1.414-1.414zM8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12z"
+                                                }
+                                              })
+                                            ]
+                                          ),
+                                          _vm._v(" "),
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: _vm.search,
+                                                expression: "search"
+                                              }
+                                            ],
+                                            staticClass:
+                                              "pl-search form-control form-input form-input-bordered w-full",
+                                            attrs: {
+                                              dusk: "filemanager-search",
+                                              type: "search",
+                                              placeholder: "Search"
+                                            },
+                                            domProps: { value: _vm.search },
+                                            on: {
+                                              input: [
+                                                function($event) {
+                                                  if ($event.target.composing) {
+                                                    return
+                                                  }
+                                                  _vm.search =
+                                                    $event.target.value
+                                                },
+                                                _vm.searchItems
+                                              ]
+                                            }
+                                          })
+                                        ])
+                                      ])
+                                    ]
                                   )
                                 ]
                               )

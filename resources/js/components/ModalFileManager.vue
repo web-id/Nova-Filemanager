@@ -31,6 +31,17 @@
                                     {{ __('Create folder') }}
                                 </button>
 
+                                <div class="flex flex-wrap justify-end">
+                                    <div class="relative z-50 w-full max-w-xs">
+                                        <div class="relative">
+                                            <div class="relative">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-labelledby="search" role="presentation" class="fill-current absolute search-icon-center ml-3 text-70"><path fill-rule="nonzero" d="M14.32 12.906l5.387 5.387a1 1 0 0 1-1.414 1.414l-5.387-5.387a8 8 0 1 1 1.414-1.414zM8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12z"></path></svg>
+                                                <input v-on:input="searchItems" v-model="search" dusk="filemanager-search" type="search" placeholder="Search" class="pl-search form-control form-input form-input-bordered w-full">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
 
                             
@@ -105,6 +116,7 @@ export default {
         noFiles: false,
         filesToUpload: [],
         firstTime: true,
+        search: ''
     }),
 
     methods: {
@@ -123,6 +135,21 @@ export default {
             });
         },
 
+        getSearchData() {
+            this.files = [];
+            this.path = [];
+            this.noFiles = false;
+            this.loadingfiles = true;
+            return api.getSearchData(this.search).then(result => {
+                if (_.size(result.files) == 0) {
+                    this.noFiles = true;
+                }
+                this.files = result.files;
+                this.path = '/';
+                this.loadingfiles = false;
+            });
+        },
+
         showModalCreateFolder() {
             this.$emit('open-modal');
         },
@@ -132,6 +159,7 @@ export default {
         },
 
         goToFolder(path) {
+            this.search = '';
             // this.currentPath = this.currentPath + '/' + path;
             this.getData(path);
             this.currentPath = path;
@@ -139,6 +167,7 @@ export default {
         },
 
         goToFolderNav(path) {
+            this.search = '';
             this.getData(path);
             this.currentPath = path;
             if (this.currentPath == '/') {
@@ -167,6 +196,11 @@ export default {
         uploadFiles(files) {
             this.$emit('uploadFiles', files);
         },
+
+        searchItems: _.debounce(function(e) {
+            this.search = e.target.value;
+            this.getSearchData();
+        }, 300),
     },
     watch: {
         active: function(val) {
