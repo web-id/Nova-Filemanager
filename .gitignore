@@ -7,3 +7,5 @@ composer.lock
 phpunit.xml
 mix-manifest.json
 \.idea/
+
+resources/js/components/\.DS_Store

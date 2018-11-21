@@ -18,6 +18,7 @@ Route::post('actions/create-folder', \WebId\Filemanager\Http\Controllers\Fileman
 Route::post('actions/delete-folder', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@deleteFolder');
 Route::post('actions/get-info', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@getInfo');
 Route::post('actions/remove-file', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@removeFile');
+Route::post('actions/move-file', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@moveFile');
 
 Route::post('uploads/add', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@upload');
 Route::get('uploads/update', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@updateFile');

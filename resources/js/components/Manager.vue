@@ -46,10 +46,14 @@
                         <div :class="filemanagerClass" v-bind:key="file.id">
                             <template v-if="view == 'grid'">
                                 <template v-if="file.type == 'file'">
-                                    <ImageLoader :file="file" class="h-40" @missing="(value) => missing = value" v-on:showInfo="showInfo" />
+                                    <drag :transfer-data="file">
+                                        <ImageLoader :file="file" class="h-40" @missing="(value) => missing = value" v-on:showInfo="showInfo" />
+                                    </drag>
                                 </template>
                                 <template v-if="file.type == 'dir'">
-                                    <Folder :file="file" class="h-40" :class="{'loading': loadingInfo}" v-on:goToFolderEvent="goToFolder" />
+                                    <drop @drop="function(transferData, nativeEvent) { handleDrop(file, transferData) }">
+                                        <Folder :file="file" class="h-40" :class="{'loading': loadingInfo}" v-on:goToFolderEvent="goToFolder" />
+                                    </drop>
                                 </template>
                             </template>
 
@@ -85,6 +89,8 @@ import api from '../api';
 import ImageLoader from '../modules/ImageLoader';
 import Folder from '../modules/Folder';
 import Loading from './Loading';
+import { Drag, Drop } from 'vue-drag-drop';
+
 let arrayFiles = [];
 
 export default {
@@ -92,6 +98,8 @@ export default {
         ImageLoader: ImageLoader,
         Folder: Folder,
         loading: Loading,
+        drag: Drag,
+        drop: Drop
     },
 
     props: {
@@ -259,6 +267,10 @@ export default {
         isImage(file) {
             return file.type.includes('image'); //returns true or false
         },
+
+        handleDrop(folder, data) {
+            this.$emit('moveFileOnFolder', {folder: folder, file: data})
+        }
     },
 
     updated: function() {

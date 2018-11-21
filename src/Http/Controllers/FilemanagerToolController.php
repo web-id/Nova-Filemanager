@@ -76,4 +76,12 @@ class FilemanagerToolController extends Controller
     {
         return $this->service->removeFile($request->file);
     }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     */
+    public function moveFile(Request $request)
+    {
+        return $this->service->ajaxMoveFileOnFolder($request->filePath, $request->folderPath);
+    }
 }

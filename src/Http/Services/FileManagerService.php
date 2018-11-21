@@ -97,6 +97,21 @@ class FileManagerService
         return response()->json(['files' => $files, 'path' => []]);
     }
 
+    public function ajaxMoveFileOnFolder($filePath, $folderPath)
+    {
+        try {
+            $fileNameExploded = explode('/', $filePath);
+            $fileName = $fileNameExploded[count($fileNameExploded) - 1];
+            $this->storage->move($filePath, $folderPath.'/'.$fileName);
+        } catch (\Exception $exception) {
+            dump($exception);
+            return response()->json([
+                'message'   => 'Error server !'
+            ], 500);
+        }
+        return response()->json([]);
+    }
+
     /**
      * Loop on $baseUrl and return all files (include files on dir).
      *

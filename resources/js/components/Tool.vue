@@ -69,6 +69,7 @@
                 v-on:refresh="refreshCurrent"
                 v-on:uploadFiles="uploadFiles"
                 v-on:showInfoItem="showInfoItem"
+                v-on:moveFileOnFolder="moveFileOnFolder"
             />
 
             <DetailPopup 
@@ -163,6 +164,14 @@ export default {
                 this.files = result.files;
                 this.path = '/';
                 this.loadingfiles = false;
+            });
+        },
+
+        moveFileOnFolder(data) {
+            this.files = [];
+            this.loadingfiles = true;
+            return api.moveFileOnFolder(data.file.path, data.folder.path).then(result => {
+                this.refreshCurrent();
             });
         },
 

@@ -13,6 +13,15 @@ export default {
             .then(response => response.data);
     },
 
+    moveFileOnFolder(filePath, folderPath) {
+        return window.axios
+            .post('/nova-vendor/infinety-es/nova-filemanager/actions/move-file', {
+                filePath: filePath,
+                folderPath: folderPath,
+            })
+            .then(response => response.data);
+    },
+
     uploadFile() {
         return window.axios
             .post('/nova-vendor/infinety-es/nova-filemanager/uploads/add')
