@@ -57,6 +57,7 @@ export default {
 
     mounted() {
         let newImage = new Image();
+        console.log(this.file, this.file.image);
         newImage.src = urlCDNResize(this.file.image, 'width', 470);
         newImage.className = 'image block w-full self-center';
         newImage.draggable = false;

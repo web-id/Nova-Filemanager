@@ -7,5 +7,5 @@ export function urlCDNCrop(image, sizeX, sizeY) {
 export function urlCDNResize(image, type, size) {
     let token = 'ayso32m5n';
     let urlSite = window.location.origin;
-    return 'https://'+token+'.cloudimg.io/'+type+'/'+size+'/x/'+urlSite+image;
+    return 'https://'+token+'.cloudimg.io/'+type+'/'+size+'/x/'+image;
 }

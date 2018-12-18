@@ -29912,7 +29912,7 @@ function urlCDNCrop(image, sizeX, sizeY) {
 function urlCDNResize(image, type, size) {
     var token = 'ayso32m5n';
     var urlSite = window.location.origin;
-    return 'https://' + token + '.cloudimg.io/' + type + '/' + size + '/x/' + urlSite + image;
+    return 'https://' + token + '.cloudimg.io/' + type + '/' + size + '/x/' + image;
 }
 
 /***/ }),
@@ -45508,6 +45508,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     mounted: function mounted() {
         var newImage = new Image();
+        console.log(this.file, this.file.image);
         newImage.src = Object(__WEBPACK_IMPORTED_MODULE_1__settings__["b" /* urlCDNResize */])(this.file.image, 'width', 470);
         newImage.className = 'image block w-full self-center';
         newImage.draggable = false;
