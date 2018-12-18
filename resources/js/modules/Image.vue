@@ -27,6 +27,7 @@
 
 <script>
 import { Minimum } from 'laravel-nova';
+import { urlCDNResize } from '../settings';
 
 export default {
     components: {
@@ -55,34 +56,12 @@ export default {
     }),
 
     mounted() {
-        Minimum(
-            window.axios.get(this.file.image, {
-                responseType: 'blob',
-            })
-        )
-            .then(({ headers, data }) => {
-                const blob = new Blob([data], { type: headers['content-type'] });
-                let newImage = new Image();
-                newImage.src = window.URL.createObjectURL(blob);
-                newImage.className = 'image block w-full self-center';
-                newImage.draggable = false;
-                this.$refs.imageDiv.appendChild(newImage);
-                this.loading = false;
-            })
-            .catch(error => {
-                if (error) {
-                    // this.missing = true;
-                    // this.$emit('missing', true);
-                    // this.loading = false;
-
-                    let newImage = new Image();
-                    newImage.src = this.file.image;
-                    newImage.className = 'image block w-full self-center';
-                    newImage.draggable = false;
-                    this.$refs.imageDiv.appendChild(newImage);
-                    this.loading = false;
-                }
-            });
+        let newImage = new Image();
+        newImage.src = urlCDNResize(this.file.image, 'width', 470);
+        newImage.className = 'image block w-full self-center';
+        newImage.draggable = false;
+        this.$refs.imageDiv.appendChild(newImage);
+        this.loading = false;
     },
 };
 </script>
