@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { Minimum } from 'laravel-nova';
+import { urlCDNCrop } from '../settings';
 
 export default {
     components: {
@@ -59,34 +59,13 @@ export default {
 
     mounted() {
         if (this.file.mime == 'image') {
-            Minimum(
-                window.axios.get(this.file.thumb, {
-                    responseType: 'blob',
-                })
-            )
-                .then(({ headers, data }) => {
-                    const blob = new Blob([data], { type: headers['content-type'] });
-                    let imageDiv = document.createElement('div');
-                    let imageBlog = null;
-
-                    imageBlog = window.URL.createObjectURL(blob);
-                    imageDiv.style.backgroundImage = "url('" + imageBlog + "')";
-                    imageDiv.className = 'block w-full h-full bg-center bg-cover h-2/3';
-                    imageDiv.draggable = false;
-                    this.$refs.image.appendChild(imageDiv);
-                    this.loading = false;
-                })
-                .catch(error => {
-                    if (error) {
-                        //defaulImage
-                        let imageDiv = document.createElement('div');
-                        imageDiv.style.backgroundImage = "url('" + this.file.thumb + "')";
-                        imageDiv.className = 'block w-full h-full bg-center bg-cover h-2/3';
-                        imageDiv.draggable = false;
-                        this.$refs.image.appendChild(imageDiv);
-                        this.loading = false;
-                    }
-                });
+            //defaulImage
+            let imageDiv = document.createElement('div');
+            imageDiv.style.backgroundImage = "url('" + urlCDNCrop(this.file.thumb, 205, 205) + "')";
+            imageDiv.className = 'block w-full h-full bg-center bg-cover h-2/3';
+            imageDiv.draggable = false;
+            this.$refs.image.appendChild(imageDiv);
+            this.loading = false;
         } else {
             this.loading = false;
         }
