@@ -187,12 +187,13 @@ class FileManagerService
      *
      * @param $file
      * @param $currentFolder
+     * @param $forceSlug
      *
      * @return  mixed
      */
-    public function uploadFile($file, $currentFolder)
+    public function uploadFile($file, $currentFolder, $forceSlug = false)
     {
-        $fileName = $this->checkFileExists($currentFolder, $file);
+        $fileName = $this->checkFileExists($currentFolder, $file, $forceSlug = false);
 
         if ($this->storage->putFileAs($currentFolder, $file, $fileName)) {
             $this->setVisibility($currentFolder, $fileName);
@@ -207,7 +208,7 @@ class FileManagerService
      *
      * @param $file
      *
-     * @return  json
+     * @return  array
      */
     public function getFileInfo($file)
     {
@@ -215,7 +216,8 @@ class FileManagerService
 
         $info = new NormalizeFile($this->storage, $fullPath, $file);
 
-        return response()->json($info->toArray());
+
+        return $info->toArray();
     }
 
     /**
@@ -256,10 +258,11 @@ class FileManagerService
 
     /**
      * @param $filePath
+     * @param $forceSlug
      */
-    private function checkFileExists($currentFolder, $file)
+    private function checkFileExists($currentFolder, $file, $forceSlug = false)
     {
-        if ($this->storage->has($currentFolder.'/'.$file->getClientOriginalName())) {
+        if ($this->storage->has($currentFolder.'/'.$file->getClientOriginalName()) || $forceSlug) {
             $random = str_random(7);
             $newName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME).'_'.mb_strtolower($random);
 

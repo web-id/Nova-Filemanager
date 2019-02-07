@@ -66,20 +66,16 @@ class FilemanagerToolController extends Controller
             'search' => $fileName,
             'extension' => $extension
         ]);
-        if(!$existeModel->count()) {
-            $fileName = $this->service->uploadFile($request->file, $request->current);
-            if($fileName) {
-                $data = $request->all();
-                unset($data['file']);
-                $data['path'] = $data['current'];
-                unset($data['current']);
-                $data['name'] = $fileName;
-                $data['extension'] = $extension;
-                if($mediaRepository->create($data)) {
-                    return response()->json(['success' => true, 'name' => $fileName]);
-                } else {
-                    return response()->json(['success' => false]);
-                }
+        $fileName = FileManagerService::getFileNameWithoutExtension($this->service->uploadFile($request->file, $request->current, !!$existeModel->count()));
+        if($fileName) {
+            $data = $request->all();
+            unset($data['file']);
+            $data['path'] = $data['current'];
+            unset($data['current']);
+            $data['name'] = $fileName;
+            $data['extension'] = $extension;
+            if($mediaRepository->create($data)) {
+                return response()->json(['success' => true, 'name' => $fileName]);
             } else {
                 return response()->json(['success' => false]);
             }
@@ -93,7 +89,19 @@ class FilemanagerToolController extends Controller
      */
     public function getInfo(Request $request)
     {
-        return $this->service->getFileInfo($request->file);
+        $info = $this->service->getFileInfo($request->file);
+        $mediaRepository = app()->make(MediaRepositoryContract::class);
+        $existeModel = $mediaRepository->findByPath($info['path']);
+        if($existeModel) {
+            $bddInfo = $existeModel->toArray();
+            unset($bddInfo['path']);
+            $bddInfo['name_without_extension'] = $bddInfo['name'];
+            unset($bddInfo['name']);
+            $mergedInfo = array_merge($bddInfo, $info);
+            return response()->json($mergedInfo);
+        } else {
+            return response()->json(false);
+        }
     }
 
     /**
@@ -104,8 +112,7 @@ class FilemanagerToolController extends Controller
         $mediaRepository = app()->make(MediaRepositoryContract::class);
         $existeModel = $mediaRepository->findByPath($request->file);
         if($existeModel) {
-            $file = $existeModel->first();
-            if($mediaRepository->delete($file->id)) {
+            if($mediaRepository->delete($existeModel->id)) {
                 return $this->service->removeFile($request->file);
             } else {
                 return response()->json(false);
