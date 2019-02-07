@@ -6,10 +6,22 @@ use Laravel\Nova\Nova;
 use Laravel\Nova\Events\ServingNova;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use WebId\Filemanager\App\Repositories\Contracts\MediaRepositoryContract;
+use WebId\Filemanager\App\Repositories\MediaRepository;
 use WebId\Filemanager\Http\Middleware\Authorize;
+use App\Traits\ModuleServiceProviderTrait;
+use WebId\Filemanager\App\Console\Commands\Install;
+use WebId\Filemanager\App\Console\Commands\Uninstall;
 
 class FilemanagerServiceProvider extends ServiceProvider
 {
+    use ModuleServiceProviderTrait;
+
+    protected $commands = [
+        Install::class,
+        Uninstall::class
+    ];
+
     /**
      * Bootstrap any application services.
      *
@@ -17,6 +29,8 @@ class FilemanagerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->setPublishes(__DIR__);
+
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'nova-filemanager');
 
         $this->app->booted(function () {
@@ -52,6 +66,12 @@ class FilemanagerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        // register the artisan commands
+        $this->commands($this->commands);
+
+        $this->app->bind(
+            MediaRepositoryContract::class,
+            MediaRepository::class
+        );
     }
 }

@@ -45,7 +45,7 @@ class Uninstall extends Command
      *
      * @var array
      */
-    private $delete_databases = ['medias', 'folders'];
+    private $delete_databases = ['medias'];
 
     /**
      * Create a new command instance.
@@ -58,7 +58,6 @@ class Uninstall extends Command
 
         $this->delete_files = [
             base_path('database/migrations/2018_08_27_150424_create_medias_table.php'),
-            base_path('database/migrations/2018_08_27_150423_create_folders_table.php')
         ];
     }
 
@@ -85,7 +84,6 @@ class Uninstall extends Command
             foreach ($this->delete_databases as $database) {
                 Schema::dropIfExists($database);
                 $this->deleteMigrationRow('2018_08_27_150424_create_medias_table');
-                $this->deleteMigrationRow('2018_08_27_150423_create_folders_table');
             }
         }
 

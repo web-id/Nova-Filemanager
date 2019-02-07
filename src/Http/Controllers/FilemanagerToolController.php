@@ -4,6 +4,7 @@ namespace WebId\Filemanager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use WebId\Filemanager\App\Repositories\Contracts\MediaRepositoryContract;
 use WebId\Filemanager\Http\Services\FileManagerService;
 
 class FilemanagerToolController extends Controller
@@ -58,7 +59,33 @@ class FilemanagerToolController extends Controller
      */
     public function upload(Request $request)
     {
-        return $this->service->uploadFile($request->file, $request->current);
+        $mediaRepository = app()->make(MediaRepositoryContract::class);
+        $fileName = FileManagerService::getFileNameWithoutExtension($request->file->getClientOriginalName());
+        $extension = FileManagerService::getFileExtension($request->file->getClientOriginalName());
+        $existeModel = $mediaRepository->all(false, [
+            'search' => $fileName,
+            'extension' => $extension
+        ]);
+        if(!$existeModel->count()) {
+            $fileName = $this->service->uploadFile($request->file, $request->current);
+            if($fileName) {
+                $data = $request->all();
+                unset($data['file']);
+                $data['path'] = $data['current'];
+                unset($data['current']);
+                $data['name'] = $fileName;
+                $data['extension'] = $extension;
+                if($mediaRepository->create($data)) {
+                    return response()->json(['success' => true, 'name' => $fileName]);
+                } else {
+                    return response()->json(['success' => false]);
+                }
+            } else {
+                return response()->json(['success' => false]);
+            }
+        } else {
+            return response()->json(['success' => false]);
+        }
     }
 
     /**
@@ -74,7 +101,18 @@ class FilemanagerToolController extends Controller
      */
     public function removeFile(Request $request)
     {
-        return $this->service->removeFile($request->file);
+        $mediaRepository = app()->make(MediaRepositoryContract::class);
+        $existeModel = $mediaRepository->findByPath($request->file);
+        if($existeModel) {
+            $file = $existeModel->first();
+            if($mediaRepository->delete($file->id)) {
+                return $this->service->removeFile($request->file);
+            } else {
+                return response()->json(false);
+            }
+        } else {
+            return response()->json(false);
+        }
     }
 
     /**
@@ -82,6 +120,14 @@ class FilemanagerToolController extends Controller
      */
     public function moveFile(Request $request)
     {
-        return $this->service->ajaxMoveFileOnFolder($request->filePath, $request->folderPath);
+        $mediaRepository = app()->make(MediaRepositoryContract::class);
+        $file = $mediaRepository->findByPath($request->filePath);
+        if($mediaRepository->update($file->id, ['path' => $request->folderPath])) {
+            return $this->service->ajaxMoveFileOnFolder($request->filePath, $request->folderPath);
+        } else {
+            return response()->json([
+                'message'   => 'Error server !'
+            ], 500);
+        }
     }
 }

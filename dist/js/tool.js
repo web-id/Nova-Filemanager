@@ -10240,6 +10240,7 @@ module.exports = g;
         });
     },
     uploadFile: function uploadFile() {
+        console.log('api');
         return window.axios.post('/nova-vendor/infinety-es/nova-filemanager/uploads/add').then(function (response) {
             return response.data;
         });
@@ -58973,6 +58974,8 @@ var token = document.head.querySelector('meta[name="csrf-token"]');
             var data = new FormData();
             data.append('file', file.file);
             data.append('current', this.current);
+
+            console.log('startUpload');
 
             window.axios.post('/nova-vendor/infinety-es/nova-filemanager/uploads/add', data, config).then(function (response) {
                 if (response.data.success == true) {

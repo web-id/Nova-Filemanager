@@ -16,10 +16,9 @@ class CreateMediasTable extends Migration
         Schema::create('medias', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->unique();
-            $table->string('image')->nullable();
+            $table->string('extension')->nullable();
+            $table->string('path')->nullable();
             $table->string('alt')->nullable();
-            $table->integer('folder_id')->unsigned()->nullable();
-            $table->foreign('folder_id')->references('id')->on('folders')->onDelete('cascade');
             $table->timestamps();
         });
     }

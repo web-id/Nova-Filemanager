@@ -31,7 +31,7 @@ class Install extends Command
      *
      * @var string
      */
-    protected $moduleName = 'ModuleFileManager';
+    protected $moduleName = 'Filemanager';
 
     /**
      * Create a new command instance.
@@ -54,15 +54,13 @@ class Install extends Command
         $this->progressBar = $this->output->createProgressBar(4);
         $this->progressBar->start();
         $this->info(" Webid\\".$this->moduleName." installation started. Please wait...");
-
-        $this->line(' Publishing models');
-        $this->publish('models');
+        $provider = "WebId\Filemanager\FilemanagerServiceProvider";
 
         $this->line(' Publishing migrations');
-        $this->publish('migrations');
+        $this->publish('migrations', $provider);
 
         $this->line(' Publishing tests');
-        $this->publish('tests');
+        $this->publish('tests', $provider);
 
         $this->line(" Migrate ModuleFileManager table(s) (using Laravel's default migrations)");
         $this->executeProcess('php artisan migrate');

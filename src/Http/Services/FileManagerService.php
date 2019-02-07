@@ -188,7 +188,7 @@ class FileManagerService
      * @param $file
      * @param $currentFolder
      *
-     * @return  json
+     * @return  mixed
      */
     public function uploadFile($file, $currentFolder)
     {
@@ -196,10 +196,9 @@ class FileManagerService
 
         if ($this->storage->putFileAs($currentFolder, $file, $fileName)) {
             $this->setVisibility($currentFolder, $fileName);
-
-            return response()->json(['success' => true, 'name' => $fileName]);
+            return $fileName;
         } else {
-            return response()->json(['success' => false]);
+            return false;
         }
     }
 
@@ -282,5 +281,30 @@ class FileManagerService
             $folder .= '/';
         }
         $this->storage->setVisibility($folder.$file, 'public');
+    }
+
+    /**
+     * Get filename without extension
+     * @param $fileName
+     * @return string
+     */
+    static public function getFileNameWithoutExtension($fileName)
+    {
+        $exploded = explode('.', $fileName);
+        if(!count($exploded)) { return $fileName; }
+        array_pop($exploded);
+        return implode('.', $exploded);
+    }
+
+    /**
+     * Get extension
+     * @param $fileName
+     * @return string
+     */
+    static public function getFileExtension($fileName)
+    {
+        $exploded = explode('.', $fileName);
+        if(!count($exploded)) { return ''; }
+        return $exploded[count($exploded) - 1];
     }
 }
