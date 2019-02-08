@@ -22,6 +22,12 @@ export default {
             .then(response => response.data);
     },
 
+    updateFile(data) {
+        return window.axios
+            .post('/nova-vendor/infinety-es/nova-filemanager/uploads/update', data)
+            .then(response => response.data);
+    },
+
     uploadFile() {
         return window.axios
             .post('/nova-vendor/infinety-es/nova-filemanager/uploads/add')

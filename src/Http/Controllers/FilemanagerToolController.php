@@ -4,6 +4,7 @@ namespace WebId\Filemanager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use WebId\Filemanager\App\Models\Media;
 use WebId\Filemanager\App\Repositories\Contracts\MediaRepositoryContract;
 use WebId\Filemanager\Http\Services\FileManagerService;
 
@@ -94,10 +95,7 @@ class FilemanagerToolController extends Controller
         $existeModel = $mediaRepository->findByPath($info['path']);
         if($existeModel) {
             $bddInfo = $existeModel->toArray();
-            unset($bddInfo['path']);
-            $bddInfo['name_without_extension'] = $bddInfo['name'];
-            unset($bddInfo['name']);
-            $mergedInfo = array_merge($bddInfo, $info);
+            $mergedInfo = $this->service::injectBddData($info, $bddInfo);
             return response()->json($mergedInfo);
         } else {
             return response()->json(false);
@@ -131,6 +129,37 @@ class FilemanagerToolController extends Controller
         $file = $mediaRepository->findByPath($request->filePath);
         if($mediaRepository->update($file->id, ['path' => $request->folderPath])) {
             return $this->service->ajaxMoveFileOnFolder($request->filePath, $request->folderPath);
+        } else {
+            return response()->json([
+                'message'   => 'Error server !'
+            ], 500);
+        }
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     */
+    public function updateFile(Request $request)
+    {
+        $mediaRepository = app()->make(MediaRepositoryContract::class);
+        $file = $mediaRepository->find($request->id);
+        $data = $request->only((new Media)->getFillable());
+        $path = $data['path'];
+        $extension = $data['extension'];
+        unset($data['path']);
+        unset($data['extension']);
+        if($file) {
+            if($mediaRepository->update($file->id, $data)) {
+                if(isset($request->name) && $file->name != $request->name) {
+                    return $this->service->renameFile($path, $request->name, $extension);
+                } else {
+                    return response()->json(true);
+                }
+            } else {
+                return response()->json([
+                    'message'   => 'Error server !'
+                ], 500);
+            }
         } else {
             return response()->json([
                 'message'   => 'Error server !'

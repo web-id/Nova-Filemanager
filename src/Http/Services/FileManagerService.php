@@ -93,6 +93,7 @@ class FileManagerService
     {
         $racineFiles = $this->getFiles('/', 'mime');
         $files = $this->loopDirsForPopulateCollectOfFiles('/', $racineFiles, $search);
+        dd($files);
 
         return response()->json(['files' => $files, 'path' => []]);
     }
@@ -286,6 +287,20 @@ class FileManagerService
         $this->storage->setVisibility($folder.$file, 'public');
     }
 
+    public function renameFile($path, $name, $extension)
+    {
+        $pathWithoutName = $this::getFilePathWithoutName($path);
+        $newPath = $pathWithoutName;
+        $newPath .= $pathWithoutName === '/' ? $name : '/' . $name;
+        $newPath .= '.' . $extension;
+        try {
+            $this->storage->move($path, $newPath);
+            return response()->json(true);
+        } catch (\Exception $exception) {
+            return response()->json(false);
+        }
+    }
+
     /**
      * Get filename without extension
      * @param $fileName
@@ -309,5 +324,30 @@ class FileManagerService
         $exploded = explode('.', $fileName);
         if(!count($exploded)) { return ''; }
         return $exploded[count($exploded) - 1];
+    }
+
+    /**
+     * inject Bdd data to fileInfo
+     * @param $dataFile
+     * @param $dataModel
+     * @return array
+     */
+    static public function injectBddData($dataFile, $dataModel) {
+        unset($dataModel['path']);
+        $dataModel['name_without_extension'] = $dataModel['name'];
+        unset($dataModel['name']);
+        return array_merge($dataFile, $dataModel);
+    }
+
+    /**
+     * Get path without name of file
+     * @param $fullPath
+     * @return string
+     */
+    static public function getFilePathWithoutName($fullPath) {
+        $exploded = explode('/', $fullPath);
+        if(!count($exploded)) { return '/'; }
+        array_pop($exploded);
+        return implode('/', $exploded);
     }
 }

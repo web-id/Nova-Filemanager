@@ -10239,8 +10239,12 @@ module.exports = g;
             return response.data;
         });
     },
+    updateFile: function updateFile(data) {
+        return window.axios.post('/nova-vendor/infinety-es/nova-filemanager/uploads/update', data).then(function (response) {
+            return response.data;
+        });
+    },
     uploadFile: function uploadFile() {
-        console.log('api');
         return window.axios.post('/nova-vendor/infinety-es/nova-filemanager/uploads/add').then(function (response) {
             return response.data;
         });
@@ -45176,6 +45180,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -45241,6 +45265,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     data: function data() {
         return {
             messagesRemove: ['Remove File', 'Are you sure', 'Removing...'],
+            messagesUpdate: ['Update File', 'Are you sure', 'Updating...'],
             cssType: ' py-custom',
             codeLoaded: false,
             zipLoaded: false,
@@ -45249,6 +45274,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 theme: 'dracula',
                 lineNumbers: true,
                 line: true
+            },
+            vModelFile: {
+                id: null,
+                name: '',
+                alt: '',
+                path: ''
             }
         };
     },
@@ -45274,6 +45305,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 }
             });
         },
+        updateFilePopup: function updateFilePopup() {
+            var _this2 = this;
+
+            this.closePreview();
+
+            return __WEBPACK_IMPORTED_MODULE_0__api__["a" /* default */].updateFile(this.vModelFile).then(function (result) {
+                if (result == true) {
+                    _this2.$toasted.show(_this2.__('File updated successfully'), { type: 'success' });
+                    _this2.$emit('refresh');
+                } else {
+                    _this2.$toasted.show(_this2.__('Error updating the file. Please check permissions'), { type: 'error' });
+                }
+            });
+        },
         selectFile: function selectFile() {
             this.closePreview();
             this.$emit('selectFile', this.info);
@@ -45283,6 +45328,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     mounted: function mounted() {
         this.$nextTick(function () {
             this.messagesRemove = [this.__('Remove File'), this.__('Are you sure?'), this.__('Removing...')];
+
+            this.messagesUpdate = [this.__('Update File'), this.__('Are you sure?'), this.__('Updating...')];
         });
     },
 
@@ -45312,22 +45359,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         'info.type': function infoType(type) {
             if (type == 'audio') {
                 this.$nextTick(function () {
-                    var _this2 = this;
+                    var _this3 = this;
 
                     setTimeout(function () {
-                        _this2.cssType = ' py-custom items-center';
-                        new __WEBPACK_IMPORTED_MODULE_5_plyr___default.a(_this2.$refs.audio);
+                        _this3.cssType = ' py-custom items-center';
+                        new __WEBPACK_IMPORTED_MODULE_5_plyr___default.a(_this3.$refs.audio);
                     });
                 });
             }
 
             if (type == 'video') {
                 this.$nextTick(function () {
-                    var _this3 = this;
+                    var _this4 = this;
 
                     setTimeout(function () {
                         // this.cssType = 'items-center';
-                        new __WEBPACK_IMPORTED_MODULE_5_plyr___default.a(_this3.$refs.video);
+                        new __WEBPACK_IMPORTED_MODULE_5_plyr___default.a(_this4.$refs.video);
                     });
                 });
             }
@@ -45356,6 +45403,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.cssType = '';
             this.codeLoaded = false;
             this.zipLoaded = false;
+
+            this.$set(this.vModelFile, 'id', this.info.id);
+            this.$set(this.vModelFile, 'alt', this.info.alt);
+            this.$set(this.vModelFile, 'name', this.info.name_without_extension);
+            this.$set(this.vModelFile, 'path', this.info.path);
+            this.$set(this.vModelFile, 'extension', this.info.extension);
         }
     }
 });
@@ -58552,30 +58605,6 @@ var render = function() {
                         { staticClass: "w-2/5 bg-30 box-info flex flex-wrap" },
                         [
                           _c("div", { staticClass: "info-data w-full" }, [
-                            _c(
-                              "div",
-                              { staticClass: "info mx-4 my-3 flex flex-wrap" },
-                              [
-                                _c(
-                                  "span",
-                                  {
-                                    staticClass:
-                                      "title bg-50 px-1 py-1 rounded-l"
-                                  },
-                                  [_vm._v(_vm._s(_vm.__("Name")) + ":")]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "span",
-                                  {
-                                    staticClass:
-                                      "value bg-white px-1 py-1 rounded-r"
-                                  },
-                                  [_vm._v(_vm._s(_vm.info.name))]
-                                )
-                              ]
-                            ),
-                            _vm._v(" "),
                             _vm.info.mime
                               ? _c(
                                   "div",
@@ -58701,14 +58730,119 @@ var render = function() {
                                 )
                               : _vm._e(),
                             _vm._v(" "),
+                            _c("div", { staticClass: "info mx-4 mt-6" }, [
+                              _c(
+                                "label",
+                                {
+                                  staticClass:
+                                    "block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2"
+                                },
+                                [
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(_vm.__("Name")) +
+                                      "\n                                "
+                                  )
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "div",
+                                {
+                                  staticClass:
+                                    "flex flex-wrap items-stretch w-full mb-4 relative"
+                                },
+                                [
+                                  _c("input", {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: _vm.vModelFile.name,
+                                        expression: "vModelFile.name"
+                                      }
+                                    ],
+                                    staticClass:
+                                      "flex-shrink flex-grow flex-auto text-xs leading-normal w-px flex-1 border border-70 rounded rounded-r-none px-1 relative",
+                                    attrs: { type: "text" },
+                                    domProps: { value: _vm.vModelFile.name },
+                                    on: {
+                                      input: function($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.$set(
+                                          _vm.vModelFile,
+                                          "name",
+                                          $event.target.value
+                                        )
+                                      }
+                                    }
+                                  })
+                                ]
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "info mx-4 mt-6" }, [
+                              _c(
+                                "label",
+                                {
+                                  staticClass:
+                                    "block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2"
+                                },
+                                [
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(_vm.__("Alt")) +
+                                      "\n                                "
+                                  )
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "div",
+                                {
+                                  staticClass:
+                                    "flex flex-wrap items-stretch w-full mb-4 relative"
+                                },
+                                [
+                                  _c("input", {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: _vm.vModelFile.alt,
+                                        expression: "vModelFile.alt"
+                                      }
+                                    ],
+                                    staticClass:
+                                      "flex-shrink flex-grow flex-auto text-xs leading-normal w-px flex-1 border border-70 rounded rounded-r-none px-1 relative",
+                                    attrs: { type: "text" },
+                                    domProps: { value: _vm.vModelFile.alt },
+                                    on: {
+                                      input: function($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.$set(
+                                          _vm.vModelFile,
+                                          "alt",
+                                          $event.target.value
+                                        )
+                                      }
+                                    }
+                                  })
+                                ]
+                              )
+                            ]),
+                            _vm._v(" "),
                             _vm.info.url
                               ? _c("div", { staticClass: "info mx-4 mt-6" }, [
                                   _c(
                                     "label",
                                     {
                                       staticClass:
-                                        "block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2",
-                                      attrs: { for: "grid-value" }
+                                        "block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2"
                                     },
                                     [
                                       _vm._v(
@@ -58788,6 +58922,19 @@ var render = function() {
                                     on: {
                                       "confirmation-success": function($event) {
                                         _vm.removeFilePopup()
+                                      }
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("confirmation-button", {
+                                    attrs: {
+                                      messages: _vm.messagesUpdate,
+                                      css:
+                                        "btn text-success text-sm font-normal h-9 px-3 mr-3 btn-link"
+                                    },
+                                    on: {
+                                      "confirmation-success": function($event) {
+                                        _vm.updateFilePopup()
                                       }
                                     }
                                   }),
@@ -58974,8 +59121,6 @@ var token = document.head.querySelector('meta[name="csrf-token"]');
             var data = new FormData();
             data.append('file', file.file);
             data.append('current', this.current);
-
-            console.log('startUpload');
 
             window.axios.post('/nova-vendor/infinety-es/nova-filemanager/uploads/add', data, config).then(function (response) {
                 if (response.data.success == true) {
