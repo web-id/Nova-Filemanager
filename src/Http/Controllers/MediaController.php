@@ -3,7 +3,7 @@
 namespace WebId\Filemanager\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Webid\Filemanager\Http\Repositories\Contracts\MediaRepositoryContract;
+use WebId\Filemanager\App\Repositories\Contracts\MediaRepositoryContract;
 
 /**
  * Class MediaController

@@ -22,14 +22,3 @@ Route::post('actions/move-file', \WebId\Filemanager\Http\Controllers\Filemanager
 
 Route::post('uploads/add', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@upload');
 Route::post('uploads/update', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@updateFile');
-
-Route::group([
-    'namespace' => 'WebId\Filemanager\Http\Controllers',
-    'middleware' => 'api'
-], function () {
-    /**
-     * Media
-     */
-    Route::get('/', 'MediaController@index');
-    Route::get('{id}', 'MediaController@show');
-});

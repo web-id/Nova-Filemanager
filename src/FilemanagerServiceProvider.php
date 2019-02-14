@@ -57,6 +57,11 @@ class FilemanagerServiceProvider extends ServiceProvider
         Route::middleware(['nova', Authorize::class])
             ->prefix('nova-vendor/infinety-es/nova-filemanager')
             ->group(__DIR__.'/../routes/api.php');
+
+        Route::middleware(['nova.ajax'])
+            ->namespace('WebId\Filemanager\Http\Controllers')
+            ->prefix('ajax/module/filemanager')
+            ->group(__DIR__.'/../routes/ajax.php');
     }
 
     /**

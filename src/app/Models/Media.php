@@ -22,4 +22,15 @@ class Media extends Model
      * @var array
      */
     protected $fillable = ['name', 'extension', 'alt', 'path'];
+
+    protected $appends = ['fullpath'];
+
+    public function getFullpathAttribute() {
+        $fullpath = '';
+        if($this->attributes['path'] !== '/') {
+            $fullpath .= $this->attributes['path'] . '/';
+        }
+        $fullpath .= $this->attributes['name'] . '.' . $this->attributes['extension'];
+        return $fullpath;
+    }
 }
