@@ -21,4 +21,4 @@ Route::post('actions/remove-file', \WebId\Filemanager\Http\Controllers\Filemanag
 Route::post('actions/move-file', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@moveFile');
 
 Route::post('uploads/add', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@upload');
-Route::get('uploads/update', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@updateFile');
+Route::post('uploads/update', \WebId\Filemanager\Http\Controllers\FilemanagerToolController::class.'@updateFile');

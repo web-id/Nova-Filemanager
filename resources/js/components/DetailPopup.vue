@@ -4,7 +4,7 @@
         <transition name="fade">
             <modal v-if="active">
                 <div class="bg-white rounded-lg shadow-lg" style="width: 70vw;">
-                    
+
                     <div class="bg-30 flex flex-wrap border-b border-70">
                         <div class="w-3/4 px-4 py-3 ">
                             {{ __('Preview of') }} <span class="text-primary-70%">{{ info.name }}</span>
@@ -61,7 +61,7 @@
                                     </iframe>
                                 </object>
                             </template>
-                            
+
                             <template v-else>
                                 <object class="no-preview" v-html="info.image">
 
@@ -73,11 +73,6 @@
                         <div class="w-2/5 bg-30 box-info flex flex-wrap">
 
                             <div class="info-data w-full">
-                                <div class="info mx-4 my-3 flex flex-wrap">
-                                    <span class="title bg-50 px-1 py-1 rounded-l">{{ __('Name') }}:</span>
-                                    <span class="value bg-white px-1 py-1 rounded-r">{{ info.name }}</span>
-                                </div>
-
                                 <div class="info mx-4 my-3 flex flex-wrap" v-if="info.mime">
                                     <span class="title bg-50 px-1 py-1 rounded-l">{{ __('Mime Type') }}:</span>
                                     <span class="value bg-white px-1 py-1 rounded-r">{{ info.mime }}</span>
@@ -98,8 +93,28 @@
                                     <span class="value bg-white px-1 py-1 rounded-r">{{ info.dimensions }}</span>
                                 </div>
 
+                                <div class="info mx-4 mt-6">
+                                    <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2">
+                                        {{ __('Name') }}
+                                    </label>
+
+                                    <div class="flex flex-wrap items-stretch w-full mb-4 relative">
+                                        <input type="text" class="flex-shrink flex-grow flex-auto text-xs leading-normal w-px flex-1 border border-70 rounded rounded-r-none px-1 relative" v-model="vModelFile.name">
+                                    </div>
+                                </div>
+
+                                <div class="info mx-4 mt-6">
+                                    <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2">
+                                        {{ __('Alt') }}
+                                    </label>
+
+                                    <div class="flex flex-wrap items-stretch w-full mb-4 relative">
+                                        <input type="text" class="flex-shrink flex-grow flex-auto text-xs leading-normal w-px flex-1 border border-70 rounded rounded-r-none px-1 relative" v-model="vModelFile.alt">
+                                    </div>
+                                </div>
+
                                 <div class="info mx-4 mt-6" v-if="info.url">
-                                    <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2" for="grid-value">
+                                    <label class="block uppercase tracking-wide text-grey-darker text-xs font-bold mb-2">
                                         {{ __('Url') }}
                                     </label>
 
@@ -107,8 +122,8 @@
                                         <input type="text" class="flex-shrink flex-grow flex-auto text-xs leading-normal w-px flex-1 border border-70 rounded rounded-r-none px-1 relative" :value="info.url">
                                         <div class="flex -mr-px">
                                             <button class="copy flex items-center leading-normal bg-50 rounded rounded-l-none border border-l-0 border-70 px-3 whitespace-no-wrap text-grey-dark text-xs" v-copy="info.url" v-copy:callback="onCopy">{{ __('Copy') }}</button>
-                                        </div>  
-                                    </div>  
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -120,6 +135,11 @@
                                         :css="'btn text-danger text-sm font-normal h-9 px-3 mr-3 btn-link'"
                                         v-on:confirmation-success="removeFilePopup()"></confirmation-button>
 
+                                    <confirmation-button
+                                        :messages="messagesUpdate"
+                                        :css="'btn text-success text-sm font-normal h-9 px-3 mr-3 btn-link'"
+                                        v-on:confirmation-success="updateFilePopup()"></confirmation-button>
+
 
                                     <template v-if="popup">
                                         <button @click="selectFile" class="btn btn-default btn-primary">
@@ -127,14 +147,14 @@
                                         </button>
                                     </template>
                                 </div>
-                                
+
                             </div>
 
                         </div>
 
                     </div>
 
-                    
+
                 </div>
             </modal>
         </transition>
@@ -205,6 +225,7 @@ export default {
 
     data: () => ({
         messagesRemove: ['Remove File', 'Are you sure', 'Removing...'],
+        messagesUpdate: ['Update File', 'Are you sure', 'Updating...'],
         cssType: ' py-custom',
         codeLoaded: false,
         zipLoaded: false,
@@ -214,6 +235,12 @@ export default {
             lineNumbers: true,
             line: true,
         },
+        vModelFile: {
+            id: null,
+            name: '',
+            alt: '',
+            path: '',
+        }
     }),
 
     methods: {
@@ -241,6 +268,22 @@ export default {
             });
         },
 
+        updateFilePopup() {
+            this.closePreview();
+
+            return api.updateFile(this.vModelFile).then(result => {
+                if (result == true) {
+                    this.$toasted.show(this.__('File updated successfully'), { type: 'success' });
+                    this.$emit('refresh');
+                } else {
+                    this.$toasted.show(
+                        this.__('Error updating the file. Please check permissions'),
+                        { type: 'error' }
+                    );
+                }
+            });
+        },
+
         selectFile() {
             this.closePreview();
             this.$emit('selectFile', this.info);
@@ -253,6 +296,12 @@ export default {
                 this.__('Remove File'),
                 this.__('Are you sure?'),
                 this.__('Removing...'),
+            ];
+
+            this.messagesUpdate = [
+                this.__('Update File'),
+                this.__('Are you sure?'),
+                this.__('Updating...'),
             ];
         });
     },
@@ -323,6 +372,12 @@ export default {
             this.cssType = '';
             this.codeLoaded = false;
             this.zipLoaded = false;
+
+            this.$set(this.vModelFile, 'id', this.info.id);
+            this.$set(this.vModelFile, 'alt', this.info.alt);
+            this.$set(this.vModelFile, 'name', this.info.name_without_extension);
+            this.$set(this.vModelFile, 'path', this.info.path);
+            this.$set(this.vModelFile, 'extension', this.info.extension);
         },
     },
 };

@@ -11,7 +11,7 @@
                 v-on:update-current-path="updateCurrentPath"
                 v-on:showInfoItem="showInfoItem"
                 v-on:uploadFiles="uploadFiles"
-                :value="value">
+                :value="valueJSONPath[currentLocale]">
                     
             </modal-filemanager>
 
@@ -31,9 +31,9 @@
 
             <UploadProgress ref="uploader" :current="currentPath" v-on:removeFile="removeFileFromUpload"></UploadProgress>
 
-            <file-select :id="field.name" :field="field" :css="errorClasses"  v-model="value" v-on:open-modal="openFilemanagerModal"></file-select>
+            <file-select :id="field.name" :field="field" :css="errorClasses"  v-model="valueJSONPath[currentLocale]" v-on:open-modal="openFilemanagerModal"></file-select>
 
-            <p class="mt-3 flex items-center text-sm" v-if="value">
+            <p class="mt-3 flex items-center text-sm" v-if="valueJSONPath[currentLocale]">
                 <button type="button" class="cursor-pointer dim btn btn-link text-primary inline-flex items-center" @click="openRemoveModal">
                     <icon type="delete" view-box="0 0 20 20" width="16" height="16" />
                     <span class="class ml-2 mt-1">
@@ -68,6 +68,7 @@ import CreateFolderModal from '../components/CreateFolderModal';
 import DetailPopup from '../components/DetailPopup';
 import UploadProgress from '../components/UploadProgress';
 import ConfirmModalRemoveFile from '../components/ConfirmModalRemoveFile';
+import {forEach} from 'lodash';
 
 export default {
     mixins: [FormField, HandlesValidationErrors],
@@ -97,6 +98,11 @@ export default {
         filesToUpload: {},
 
         removeModalOpen: false,
+
+        locales: null,
+        currentLocale: null,
+        valueJSON: {},
+        valueJSONPath: {}
     }),
 
     methods: {
@@ -188,13 +194,38 @@ export default {
          * Update the field's internal value.
          */
         setValue(file) {
-            this.value = file.path;
+            this.valueJSONPath[this.currentLocale] = file.path;
+            this.valueJSON[this.currentLocale] = file.id;
+            this.value = JSON.stringify(this.valueJSON);
             this.closeFilemanagerModal();
         },
+
+        changeTab(locale) {
+            this.currentLocale = locale;
+        },
+
+        setPathFromBDD()
+        {
+            forEach(this.valueJSON, (id, lang) => {
+                Nova.request().get('/ajax/module/filemanager/' + id).then((response) => {
+                    this.$set(this.valueJSONPath, lang, response.data.fullpath)
+                });
+            });
+        }
     },
 
     created() {
         this.setCurrentPath();
+    },
+
+    mounted() {
+        this.locales = Object.keys(this.field.locales);
+        this.currentLocale = document.querySelector('#select-language-translatable').value;
+        this.valueJSON = this.value === "" ? {} : JSON.parse(this.value);
+        this.setPathFromBDD();
+        Nova.$on('change-language', (lang) => {
+            this.changeTab(lang);
+        });
     },
 };
 </script>
