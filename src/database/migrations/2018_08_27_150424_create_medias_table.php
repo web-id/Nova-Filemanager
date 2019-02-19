@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use WebId\Filemanager\App\MediaFromFiles;
 
 class CreateMediasTable extends Migration
 {
@@ -21,6 +22,9 @@ class CreateMediasTable extends Migration
             $table->string('alt')->nullable();
             $table->timestamps();
         });
+
+        $mediaTool = new MediaFromFiles();
+        $mediaTool->populate();
     }
 
     /**
