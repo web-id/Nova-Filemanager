@@ -93,7 +93,6 @@ class FileManagerService
     {
         $racineFiles = $this->getFiles('/', 'mime');
         $files = $this->loopDirsForPopulateCollectOfFiles('/', $racineFiles, $search);
-        dd($files);
 
         return response()->json(['files' => $files, 'path' => []]);
     }
