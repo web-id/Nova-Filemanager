@@ -14,17 +14,14 @@ class CreateMediasTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('medias')) {
-            Schema::create('medias', function (Blueprint $table) {
-                $table->increments('id');
-                $table->string('name')->unique();
-                $table->string('extension')->nullable();
-                $table->string('path')->nullable();
-                $table->string('alt')->nullable();
-                $table->timestamps();
-            });
-        }
-
+        Schema::create('medias', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->unique();
+            $table->string('extension')->nullable();
+            $table->string('path')->nullable();
+            $table->string('alt')->nullable();
+            $table->timestamps();
+        });
         $mediaTool = new MediaFromFiles();
         $mediaTool->populate();
     }

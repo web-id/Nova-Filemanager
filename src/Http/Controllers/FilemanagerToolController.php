@@ -151,7 +151,11 @@ class FilemanagerToolController extends Controller
         if($file) {
             if($mediaRepository->update($file->id, $data)) {
                 if(isset($request->name) && $file->name != $request->name) {
-                    return $this->service->renameFile($path, $request->name, $extension);
+                    if($this->service->renameFile($path, $request->name, $extension)) {
+                        return response()->json(true);
+                    } else {
+                        return response()->json(false);
+                    }
                 } else {
                     return response()->json(true);
                 }
