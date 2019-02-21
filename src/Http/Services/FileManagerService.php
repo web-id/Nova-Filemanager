@@ -294,9 +294,9 @@ class FileManagerService
         $newPath .= '.' . $extension;
         try {
             $this->storage->move($path, $newPath);
-            return response()->json(true);
+            return true;
         } catch (\Exception $exception) {
-            return response()->json(false);
+            return false;
         }
     }
 
@@ -310,7 +310,11 @@ class FileManagerService
         $exploded = explode('.', $fileName);
         if(!count($exploded)) { return $fileName; }
         array_pop($exploded);
-        return implode('.', $exploded);
+        $withoutExtension = implode('.', $exploded);
+
+        $exploded = explode('/', $withoutExtension);
+        if(!count($exploded)) { return $withoutExtension; }
+        return array_pop($exploded);
     }
 
     /**
