@@ -37,14 +37,8 @@ class MediaFromFiles {
             $media->extension = FileManagerService::getFileExtension($file->path) ?? '';
             $media->path = FileManagerService::getFilePathWithoutName($file->path) ?? '';
             $existe = Media::where('name', $media->name)->where('extension', $media->extension)->first();
-            if($existe) {
-                $random = str_random(7);
-                $media->name = $media->name . $random;
-                if($this->service->renameFile($file->path, $media->name, $media->extension)) {
-                    $media->save();
-                }
-            } else {
-                return $media->save();
+            if(!$existe) {
+                $media->save();
             }
         });
     }
