@@ -47,10 +47,11 @@ class MediaRepository extends BaseRepository implements MediaRepositoryContract
      * Retourne le media en fonction de l'id
      * @param int $id
      * @return mixed
+     * @throws ModelNotFoundException
      */
     public function find(int $id)
     {
-        return $this->model->find($id);
+        return $this->model->findOrFail($id);
     }
 
     /**
