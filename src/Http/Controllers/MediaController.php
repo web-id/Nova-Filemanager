@@ -4,6 +4,7 @@ namespace WebId\Filemanager\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use WebId\Filemanager\App\Repositories\Contracts\MediaRepositoryContract;
+use Illuminate\Http\Request;
 
 /**
  * Class MediaController
@@ -15,9 +16,14 @@ class MediaController extends Controller
     /**
      * @return mixed
      */
-    public function index() {
+    public function index(Request $request) {
         $mediaRepository = app()->make(MediaRepositoryContract::class);
-        return response()->json($mediaRepository->all());
+        return response()->json($mediaRepository->all(true, [
+            'search' => $request->search,
+            'notIn' => $request->notIn,
+            'in' => $request->in,
+            'paginateCount' => $request->paginateCount,
+        ]));
     }
 
     /**

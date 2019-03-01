@@ -32,6 +32,7 @@ class MediaRepository extends BaseRepository implements MediaRepositoryContract
         $notIn = isset($options['notIn']) ? $options['notIn'] : null;
         $in = isset($options['in']) ? $options['in'] : null;
         $extension = isset($options['extension']) ? $options['extension'] : null;
+        $paginateCount = isset($options['paginateCount']) ? $options['paginateCount'] : env('MODULE_FILEMANAGER_PAGINATE', 15);
 
         $query = $this->model;
         if($search) { $query = $query->where('name', 'LIKE', "%$search%"); }
@@ -40,7 +41,7 @@ class MediaRepository extends BaseRepository implements MediaRepositoryContract
         if($extension) { $query = $query->where('extension', $extension); }
         $query = $query->orderBy('updated_at', 'desc');
 
-        return $paginate ? $query->paginate(env('MODULE_FILEMANAGER_PAGINATE', 15)) : $query->get();
+        return $paginate ? $query->paginate($paginateCount) : $query->get();
     }
 
     /**

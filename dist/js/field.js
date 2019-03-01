@@ -62193,7 +62193,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }
         },
         removeFile: function removeFile() {
-            this.value = null;
+            this.valueJSONPath[this.currentLocale] = null;
             this.removeModalOpen = false;
         },
         openRemoveModal: function openRemoveModal() {
