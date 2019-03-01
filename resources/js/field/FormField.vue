@@ -164,7 +164,7 @@ export default {
         },
 
         removeFile() {
-            this.value = null;
+            this.valueJSONPath[this.currentLocale] = null;
             this.removeModalOpen = false;
         },
 
