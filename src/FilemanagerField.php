@@ -15,6 +15,28 @@ class FilemanagerField extends Field
     public $component = 'filemanager-field';
 
     /**
+     * Create a new field.
+     *
+     * @param  string  $name
+     * @param  string|null  $attribute
+     * @param  mixed|null  $resolveCallback
+     * @return void
+     */
+    public function __construct($name, $attribute = null, $resolveCallback = null)
+    {
+        parent::__construct($name, $attribute, $resolveCallback);
+
+        $locales = array_map(function ($value) {
+            return __($value);
+        }, config('translatable.locales'));
+
+        $this->withMeta([
+            'locales' => $locales,
+            'indexLocale' => app()->getLocale()
+        ]);
+    }
+
+    /**
      * Set display in details and list as image or icon.
      *
      * @return $this

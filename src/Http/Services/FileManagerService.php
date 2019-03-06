@@ -187,19 +187,19 @@ class FileManagerService
      *
      * @param $file
      * @param $currentFolder
+     * @param $forceSlug
      *
-     * @return  json
+     * @return  mixed
      */
-    public function uploadFile($file, $currentFolder)
+    public function uploadFile($file, $currentFolder, $forceSlug = false)
     {
-        $fileName = $this->checkFileExists($currentFolder, $file);
+        $fileName = $this->checkFileExists($currentFolder, $file, $forceSlug = false);
 
         if ($this->storage->putFileAs($currentFolder, $file, $fileName)) {
             $this->setVisibility($currentFolder, $fileName);
-
-            return response()->json(['success' => true, 'name' => $fileName]);
+            return $fileName;
         } else {
-            return response()->json(['success' => false]);
+            return false;
         }
     }
 
@@ -208,7 +208,7 @@ class FileManagerService
      *
      * @param $file
      *
-     * @return  json
+     * @return  array
      */
     public function getFileInfo($file)
     {
@@ -216,7 +216,8 @@ class FileManagerService
 
         $info = new NormalizeFile($this->storage, $fullPath, $file);
 
-        return response()->json($info->toArray());
+
+        return $info->toArray();
     }
 
     /**
@@ -257,10 +258,11 @@ class FileManagerService
 
     /**
      * @param $filePath
+     * @param $forceSlug
      */
-    private function checkFileExists($currentFolder, $file)
+    private function checkFileExists($currentFolder, $file, $forceSlug = false)
     {
-        if ($this->storage->has($currentFolder.'/'.$file->getClientOriginalName())) {
+        if ($this->storage->has($currentFolder.'/'.$file->getClientOriginalName()) || $forceSlug) {
             $random = str_random(7);
             $newName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME).'_'.mb_strtolower($random);
 
@@ -282,5 +284,73 @@ class FileManagerService
             $folder .= '/';
         }
         $this->storage->setVisibility($folder.$file, 'public');
+    }
+
+    public function renameFile($path, $name, $extension)
+    {
+        $pathWithoutName = $this::getFilePathWithoutName($path);
+        $newPath = $pathWithoutName;
+        $newPath .= $pathWithoutName === '/' ? $name : '/' . $name;
+        $newPath .= '.' . $extension;
+        try {
+            $this->storage->move($path, $newPath);
+            return true;
+        } catch (\Exception $exception) {
+            return false;
+        }
+    }
+
+    /**
+     * Get filename without extension
+     * @param $fileName
+     * @return string
+     */
+    static public function getFileNameWithoutExtension($fileName)
+    {
+        $exploded = explode('.', $fileName);
+        if(!count($exploded)) { return $fileName; }
+        array_pop($exploded);
+        $withoutExtension = implode('.', $exploded);
+
+        $exploded = explode('/', $withoutExtension);
+        if(!count($exploded)) { return $withoutExtension; }
+        return array_pop($exploded);
+    }
+
+    /**
+     * Get extension
+     * @param $fileName
+     * @return string
+     */
+    static public function getFileExtension($fileName)
+    {
+        $exploded = explode('.', $fileName);
+        if(!count($exploded)) { return ''; }
+        return $exploded[count($exploded) - 1];
+    }
+
+    /**
+     * inject Bdd data to fileInfo
+     * @param $dataFile
+     * @param $dataModel
+     * @return array
+     */
+    static public function injectBddData($dataFile, $dataModel) {
+        unset($dataModel['path']);
+        $dataModel['name_without_extension'] = $dataModel['name'];
+        unset($dataModel['name']);
+        return array_merge($dataFile, $dataModel);
+    }
+
+    /**
+     * Get path without name of file
+     * @param $fullPath
+     * @return string
+     */
+    static public function getFilePathWithoutName($fullPath) {
+        $exploded = explode('/', $fullPath);
+        if(!count($exploded)) { return '/'; }
+        array_pop($exploded);
+        return implode('/', $exploded);
     }
 }
