@@ -36,9 +36,17 @@ class MediaFromFiles {
             $media->name = FileManagerService::getFileNameWithoutExtension($file->path) ?? '';
             $media->extension = FileManagerService::getFileExtension($file->path) ?? '';
             $media->path = FileManagerService::getFilePathWithoutName($file->path) ?? '';
-            $existe = Media::where('name', $media->name)->where('extension', $media->extension)->first();
+            $existe = Media::where('name', $media->name)->where('extension', $media->extension)->where('path', $media->path)->first();
             if(!$existe) {
-                $media->save();
+                $nameExiste = Media::where('name', $media->name)->where('extension', $media->extension)->first();
+                if(!$nameExiste) {
+                    $media->save();
+                } else {
+                    $random = str_random(7);
+                    $media->name = $media->name . '_' . $random;
+                    $this->service->renameFile($file->path, $media->name, $media->extension);
+                    $media->save();
+                }
             }
         });
     }
