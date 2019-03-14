@@ -131,9 +131,17 @@ class FileManagerService
             } else {
                 if($search) {
                     if(strpos($file->name, $search) !== false) {
+                        $pos = strpos($file->path, $baseUrl);
+                        if ($baseUrl !== '/' && $pos === false) {
+                            $file->path = $baseUrl === '/' ? $file->path : $baseUrl . '/' . $file->path;
+                        }
                         $files->push($file);
                     }
                 } else {
+                    $pos = strpos($file->path, $baseUrl);
+                    if ($baseUrl !== '/' && $pos === false) {
+                        $file->path = $baseUrl === '/' ? $file->path : $baseUrl . '/' . $file->path;
+                    }
                     $files->push($file);
                 }
             }
@@ -193,7 +201,7 @@ class FileManagerService
      */
     public function uploadFile($file, $currentFolder, $forceSlug = false)
     {
-        $fileName = $this->checkFileExists($currentFolder, $file, $forceSlug = false);
+        $fileName = $this->checkFileExists($currentFolder, $file, $forceSlug);
 
         if ($this->storage->putFileAs($currentFolder, $file, $fileName)) {
             $this->setVisibility($currentFolder, $fileName);
