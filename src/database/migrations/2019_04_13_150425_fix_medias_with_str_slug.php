@@ -15,7 +15,7 @@ class FixMediasWithStrSlug extends Migration
     public function up()
     {
         $mediaTool = new MediaFromFiles();
-        //$mediaTool->forceStrSlug();
+        $mediaTool->forceStrSlug();
         $mediaTool->populate();
     }
 
