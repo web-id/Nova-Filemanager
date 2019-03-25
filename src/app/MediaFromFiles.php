@@ -31,11 +31,31 @@ class MediaFromFiles
      *
      * @param $name
      * @param $extension
+     * @param $path
      * @return bool
      */
-    public function existInDDB($name, $extension)
+    public function existInDB($name, $extension, $path = null)
     {
-        $media = Media::where('name', $name)->where('extension', $extension)->first();
+        $query = Media::where('name', 'LIKE', $name)->where('extension', $extension);
+        if($path) {
+            $query->where('path', $path);
+        }
+        $media = $query->first();
+        return !!$media;
+    }
+
+    /**
+     * Exist in BDD with another path ?
+     *
+     * @param $name
+     * @param $extension
+     * @param $path
+     * @return bool
+     */
+    public function existInDBWithAnotherPath($name, $extension, $path)
+    {
+        $query = Media::where('name', $name)->where('extension', $extension)->where('path', 'NOT LIKE', $path);
+        $media = $query->first();
         return !!$media;
     }
 
@@ -89,7 +109,7 @@ class MediaFromFiles
             $name_slugged = str_slug($media->name);
             if ($media->name != $name_slugged) { //Need to rename file
                 if ($this->existInStorage($this->getFullPathFile($name_slugged, $media->path, $media->extension))) { //File already named like this in path
-                    $name_slugged = $name_slugged . '_' . $this->getRandomStr(7);
+                    $name_slugged = $name_slugged . '-' . $this->getRandomStr(7);
                     $media->name = $name_slugged;
                     $media->save();
                     $this->service->renameFile($media->fullpath, $name_slugged, $media->extension);
@@ -113,6 +133,17 @@ class MediaFromFiles
         $media->name = FileManagerService::getFileNameWithoutExtension($file->path) ?? '';
         $media->extension = FileManagerService::getFileExtension($file->path) ?? '';
         $media->path = FileManagerService::getFilePathWithoutName($file->path) ?? '';
+
+        $fullpath = $media->fullpath; //fullpath is dynamic by the name so let's save the real one
+
+        if($media->name != str_slug($media->name)) {
+            $media->name = str_slug($media->name);
+            if($this->existInDB(str_slug($media->name), $media->extension) || $this->service->exists($media->fullpath)) {
+                $media->name = $media->name . '-' . $this->getRandomStr(7);
+            }
+            $this->service->renameFile($fullpath, $media->name, $media->extension);
+        }
+
         return $media;
     }
 
@@ -125,13 +156,16 @@ class MediaFromFiles
         $files = $this->service->loopDirsForPopulateCollectOfFiles('/', $racineFiles);
         $files->each(function ($file) {
             $media = $this->getMediaFromFileStorage($file);
-            $name_slugged = str_slug($media->name);
             $fullpath = $media->fullpath; //the real because changing name, change fullpath here
-            dd();
-            if(!$this->existInDDB($media->name, $media->extension) || $name_slugged != $media->name) {
-                $media->name = $name_slugged . '_' . $this->getRandomStr(7);
-                $this->service->renameFile($fullpath, $media->name, $media->extension);
+
+            if(!$this->existInDB($media->name, $media->extension)) { //New file
                 $media->save();
+            } else { //Exist
+                if($this->existInDBWithAnotherPath($media->name, $media->extension, $media->path)) { //Check if same file in another path
+                    $media->name = $media->name . '-' . $this->getRandomStr(7);
+                    $this->service->renameFile($fullpath, $media->name, $media->extension);
+                    $media->save();
+                }
             }
         });
     }
