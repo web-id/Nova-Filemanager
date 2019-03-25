@@ -308,6 +308,11 @@ class FileManagerService
         }
     }
 
+    public function exists($file)
+    {
+        return $this->storage->exists($file);
+    }
+
     /**
      * Get filename without extension
      * @param $fileName
