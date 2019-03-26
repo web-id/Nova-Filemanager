@@ -60515,6 +60515,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         if (this.file.mime == 'image') {
             //defaulImage
             var imageDiv = document.createElement('div');
+            console.log(this.file);
             imageDiv.style.backgroundImage = "url('" + Object(__WEBPACK_IMPORTED_MODULE_0__settings__["a" /* urlCDNCrop */])(this.file.thumb, 205, 205) + "')";
             imageDiv.className = 'block w-full h-full bg-center bg-cover h-2/3';
             imageDiv.draggable = false;
