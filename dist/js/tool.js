@@ -45309,7 +45309,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var _this2 = this;
 
             this.closePreview();
-
             return __WEBPACK_IMPORTED_MODULE_0__api__["a" /* default */].updateFile(this.vModelFile).then(function (result) {
                 if (result == true) {
                     _this2.$toasted.show(_this2.__('File updated successfully'), { type: 'success' });
@@ -45317,6 +45316,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 } else {
                     _this2.$toasted.show(_this2.__('Error updating the file. Please check permissions'), { type: 'error' });
                 }
+            }).catch(function (error) {
+                _this2.$toasted.show(_this2.__(error.response.data.message || 'Error updating the file.'), { type: 'error' });
             });
         },
         selectFile: function selectFile() {

@@ -270,7 +270,6 @@ export default {
 
         updateFilePopup() {
             this.closePreview();
-
             return api.updateFile(this.vModelFile).then(result => {
                 if (result == true) {
                     this.$toasted.show(this.__('File updated successfully'), { type: 'success' });
@@ -281,6 +280,11 @@ export default {
                         { type: 'error' }
                     );
                 }
+            }).catch((error) => {
+                this.$toasted.show(
+                    this.__(error.response.data.message || 'Error updating the file.'),
+                    { type: 'error' }
+                );
             });
         },
 
