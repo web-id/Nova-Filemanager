@@ -67,7 +67,8 @@ class MediaFromFiles
      */
     public function existInStorage($pathFile)
     {
-        return $this->service->exists($pathFile);
+        return file_exists($pathFile);
+        //return $this->service->exists($pathFile);
     }
 
     /**
