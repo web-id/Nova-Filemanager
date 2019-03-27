@@ -67,7 +67,8 @@ class MediaFromFiles
      */
     public function existInStorage($pathFile)
     {
-        return $this->service->exists($pathFile);
+        return file_exists($pathFile);
+        //return $this->service->exists($pathFile);
     }
 
     /**
@@ -107,16 +108,17 @@ class MediaFromFiles
         $medias = Media::all();
         $medias->each(function ($media) {
             $name_slugged = str_slug($media->name);
+            $realPath = $media->fullpath;
             if ($media->name != $name_slugged) { //Need to rename file
                 if ($this->existInStorage($this->getFullPathFile($name_slugged, $media->path, $media->extension))) { //File already named like this in path
                     $name_slugged = $name_slugged . '-' . $this->getRandomStr(7);
                     $media->name = $name_slugged;
                     $media->save();
-                    $this->service->renameFile($media->fullpath, $name_slugged, $media->extension);
+                    $this->service->renameFile($realPath, $name_slugged, $media->extension);
                 } else {
                     $media->name = $name_slugged;
                     $media->save();
-                    $this->service->renameFile($media->fullpath, $name_slugged, $media->extension);
+                    $this->service->renameFile($realPath, $name_slugged, $media->extension);
                 }
             }
         });
