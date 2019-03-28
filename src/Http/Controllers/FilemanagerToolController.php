@@ -60,28 +60,28 @@ class FilemanagerToolController extends Controller
      */
     public function upload(Request $request)
     {
-        $mediaRepository = app()->make(MediaRepositoryContract::class);
-        $fileName = FileManagerService::getFileNameWithoutExtension($request->file->getClientOriginalName());
-        $extension = FileManagerService::getFileExtension($request->file->getClientOriginalName());
-        $existeModel = $mediaRepository->all(false, [
-            'search' => $fileName,
-            'extension' => $extension
-        ]);
-        $fileName = FileManagerService::getFileNameWithoutExtension($this->service->uploadFile($request->file, $request->current, !!$existeModel->count()));
-        if($fileName) {
-            $data = $request->all();
-            unset($data['file']);
-            $data['path'] = $data['current'];
-            unset($data['current']);
-            $data['name'] = $fileName;
-            $data['extension'] = $extension;
-            if($mediaRepository->create($data)) {
-                return response()->json(['success' => true, 'name' => $fileName]);
+        $media = new Media;
+        $media->name = FileManagerService::getFileNameWithoutExtension($request->file->getClientOriginalName()) ?? '';
+        $media->extension = FileManagerService::getFileExtension($request->file->getClientOriginalName()) ?? '';
+        $media->path = $request->current ?? '';
+        $fullpath = $request->file->path();
+        $media->name = str_slug($media->name);
+
+        if(!$this->service->existInDB($media->name, $media->extension)) { //New file
+            if($this->service->uploadFile($fullpath, $request->current, $media->name, $media->extension)) {
+                $media->save();
+                return response()->json(['success' => true, 'name' => $media->name]);
             } else {
                 return response()->json(['success' => false]);
             }
-        } else {
-            return response()->json(['success' => false]);
+        } else { //Exist
+            $media->name = $media->name . '-' . strtolower(str_random(7));
+            if($this->service->uploadFile($fullpath, $request->current, $media->name, $media->extension)) {
+                $media->save();
+                return response()->json(['success' => true, 'name' => $media->name]);
+            } else {
+                return response()->json(['success' => false]);
+            }
         }
     }
 
@@ -149,20 +149,26 @@ class FilemanagerToolController extends Controller
         unset($data['path']);
         unset($data['extension']);
         if($file) {
-            if($mediaRepository->update($file->id, $data)) {
-                if(isset($request->name) && $file->name != $request->name) {
-                    if($this->service->renameFile($path, $request->name, $extension)) {
-                        return response()->json(true);
+            if($this->service->existInDB($request->name, $file->extension)) {
+                return response()->json([
+                    'message'   => 'Name already taken.'
+                ], 500);
+            } else {
+                if($mediaRepository->update($file->id, $data)) {
+                    if(isset($request->name) && $file->name != $request->name) {
+                        if($this->service->renameFile($path, $request->name, $extension)) {
+                            return response()->json(true);
+                        } else {
+                            return response()->json(false);
+                        }
                     } else {
-                        return response()->json(false);
+                        return response()->json(true);
                     }
                 } else {
-                    return response()->json(true);
+                    return response()->json([
+                        'message'   => 'Error server !'
+                    ], 500);
                 }
-            } else {
-                return response()->json([
-                    'message'   => 'Error server !'
-                ], 500);
             }
         } else {
             return response()->json([

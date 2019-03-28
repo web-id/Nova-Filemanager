@@ -4,6 +4,8 @@ namespace WebId\Filemanager\Http\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use WebId\Filemanager\App\Models\Media;
+use Illuminate\Http\File;
 
 class FileManagerService
 {
@@ -193,18 +195,18 @@ class FileManagerService
     /**
      * Upload a file on current folder.
      *
-     * @param $file
+     * @param $filePath
      * @param $currentFolder
-     * @param $forceSlug
+     * @param $fileName
+     * @param $extension
      *
      * @return  mixed
      */
-    public function uploadFile($file, $currentFolder, $forceSlug = false)
+    public function uploadFile($filePath, $currentFolder, $fileName, $extension)
     {
-        $fileName = $this->checkFileExists($currentFolder, $file, $forceSlug);
-
-        if ($this->storage->putFileAs($currentFolder, $file, $fileName)) {
-            $this->setVisibility($currentFolder, $fileName);
+        $file = new File($filePath);
+        if ($this->storage->putFileAs($currentFolder, $file, $fileName . '.' . $extension)) {
+            $this->setVisibility($currentFolder, $fileName . '.' . $extension);
             return $fileName;
         } else {
             return false;
@@ -308,6 +310,44 @@ class FileManagerService
         }
     }
 
+    public function exists($file)
+    {
+        return $this->storage->exists($file);
+    }
+
+    /**
+     * Exist in BDD ?
+     *
+     * @param $name
+     * @param $extension
+     * @param $path
+     * @return bool
+     */
+    public function existInDB($name, $extension, $path = null)
+    {
+        $query = Media::where('name', 'LIKE', $name)->where('extension', $extension);
+        if($path) {
+            $query->where('path', $path);
+        }
+        $media = $query->first();
+        return !!$media;
+    }
+
+    /**
+     * Exist in BDD with another path ?
+     *
+     * @param $name
+     * @param $extension
+     * @param $path
+     * @return bool
+     */
+    public function existInDBWithAnotherPath($name, $extension, $path)
+    {
+        $query = Media::where('name', $name)->where('extension', $extension)->where('path', 'NOT LIKE', $path);
+        $media = $query->first();
+        return !!$media;
+    }
+
     /**
      * Get filename without extension
      * @param $fileName
@@ -360,5 +400,24 @@ class FileManagerService
         if(!count($exploded)) { return '/'; }
         array_pop($exploded);
         return implode('/', $exploded);
+    }
+
+    /**
+     * get a filepath for file
+     *
+     * @param $name
+     * @param $path
+     * @param $extension
+     * @return string
+     */
+    static function getFullPathFile($name, $path, $extension)
+    {
+        $fullpath = '';
+        if ($path !== '/') {
+            $fullpath .= $path.'/';
+        }
+        $fullpath .= $name.'.'.$extension;
+
+        return $fullpath;
     }
 }
