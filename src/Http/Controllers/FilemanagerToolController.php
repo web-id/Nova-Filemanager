@@ -44,7 +44,7 @@ class FilemanagerToolController extends Controller
      */
     public function createFolder(Request $request)
     {
-        return $this->service->createFolderOnPath($request->folder, $request->current);
+        return $this->service->createFolderOnPath(str_slug($request->folder), $request->current);
     }
 
     /**

@@ -114,6 +114,24 @@ class FileManagerService
         return response()->json([]);
     }
 
+    public function loopDirsForPopulateCollectOfFolders($baseUrl, $racineFiles)
+    {
+        $folders = collect();
+        $racineFiles->each(function($file) use (&$folders, $baseUrl) {
+            if($file->type === "dir") {
+                $pos = strpos($file->path, $baseUrl);
+                if ($baseUrl !== '/' && $pos === false) {
+                    $file->path = $baseUrl === '/' ? $file->path : $baseUrl . '/' . $file->path;
+                }
+                $folders->push($file);
+                $folders = $folders->merge(
+                    $this->loopDirsForPopulateCollectOfFolders($file->path, $this->getFiles($file->path, 'mime'))
+                );
+            }
+        });
+        return $folders;
+    }
+
     /**
      * Loop on $baseUrl and return all files (include files on dir).
      *
@@ -304,6 +322,25 @@ class FileManagerService
         $newPath .= '.' . $extension;
         try {
             $this->storage->move($path, $newPath);
+            return true;
+        } catch (\Exception $exception) {
+            return false;
+        }
+    }
+
+    public function renameFolder($path, $name)
+    {
+        try {
+            //HACK
+            $pathWithoutName = $this::getFilePathWithoutName($path);
+            $newPath = $pathWithoutName;
+            $newPath .= $pathWithoutName === '/' ? $name . 'hackfix' : '/' . $name . 'hackfix';
+            $this->storage->move($path, $newPath);
+
+            $hackPath = $newPath;
+            $newPath = $pathWithoutName;
+            $newPath .= $pathWithoutName === '/' ? $name : '/' . $name;
+            $this->storage->move($hackPath, $newPath);
             return true;
         } catch (\Exception $exception) {
             return false;
