@@ -68,7 +68,6 @@ class MediaFromFiles
     public function existInStorage($pathFile)
     {
         return file_exists($pathFile);
-        //return $this->service->exists($pathFile);
     }
 
     /**
@@ -121,6 +120,44 @@ class MediaFromFiles
                     $this->service->renameFile($realPath, $name_slugged, $media->extension);
                 }
             }
+        });
+    }
+
+    /**
+     * Convert existing folder and BDD for using str_slug()
+     */
+    public function forceStrSlugFolder()
+    {
+        $racineFiles = $this->service->getFiles('/', 'mime');
+        $folders = $this->service->loopDirsForPopulateCollectOfFolders('/', $racineFiles);
+        $folders = $folders->reverse();
+        $folders->each(function ($folder) {
+            if($folder->name != str_slug($folder->name)) {
+                $this->service->renameFolder($folder->path, str_slug($folder->name));
+            }
+        });
+    }
+
+    public function forceStrSlugFolderInBdd()
+    {
+        $medias = Media::all();
+        $medias->each(function ($media) {
+            $exploded = explode('/', $media->path);
+            if(!count($exploded)) {
+                if($media->path != str_slug($media->path)) {
+                    $media->path = str_slug($media->path);
+                }
+            } else {
+                $newPath = '';
+                foreach($exploded as $key => $folder) {
+                    if($key != 0) { $newPath .= '/'; }
+                    $newPath .= str_slug($folder);
+                }
+                if($media->path != $newPath) {
+                    $media->path = $newPath;
+                }
+            }
+            $media->save();
         });
     }
 
