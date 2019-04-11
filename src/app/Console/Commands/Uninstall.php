@@ -88,6 +88,7 @@ class Uninstall extends Command
         }
 
         $this->progressBar->finish();
+        $this->toggleModule(false);
         $this->info(" Webid\\" . $this->moduleName . " uninstallation finished.");
     }
 
