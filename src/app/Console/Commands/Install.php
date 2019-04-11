@@ -66,6 +66,7 @@ class Install extends Command
         $this->executeProcess('php artisan migrate');
 
         $this->progressBar->finish();
+        $this->toggleModule(true);
         $this->info(" Webid\\".$this->moduleName." installation finished.");
     }
 }
