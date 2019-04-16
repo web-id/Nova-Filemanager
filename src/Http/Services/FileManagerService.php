@@ -4,6 +4,8 @@ namespace WebId\Filemanager\Http\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use WebId\Filemanager\App\Models\Media;
+use Illuminate\Http\File;
 
 class FileManagerService
 {
@@ -112,6 +114,24 @@ class FileManagerService
         return response()->json([]);
     }
 
+    public function loopDirsForPopulateCollectOfFolders($baseUrl, $racineFiles)
+    {
+        $folders = collect();
+        $racineFiles->each(function($file) use (&$folders, $baseUrl) {
+            if($file->type === "dir") {
+                $pos = strpos($file->path, $baseUrl);
+                if ($baseUrl !== '/' && $pos === false) {
+                    $file->path = $baseUrl === '/' ? $file->path : $baseUrl . '/' . $file->path;
+                }
+                $folders->push($file);
+                $folders = $folders->merge(
+                    $this->loopDirsForPopulateCollectOfFolders($file->path, $this->getFiles($file->path, 'mime'))
+                );
+            }
+        });
+        return $folders;
+    }
+
     /**
      * Loop on $baseUrl and return all files (include files on dir).
      *
@@ -131,9 +151,17 @@ class FileManagerService
             } else {
                 if($search) {
                     if(strpos($file->name, $search) !== false) {
+                        $pos = strpos($file->path, $baseUrl);
+                        if ($baseUrl !== '/' && $pos === false) {
+                            $file->path = $baseUrl === '/' ? $file->path : $baseUrl . '/' . $file->path;
+                        }
                         $files->push($file);
                     }
                 } else {
+                    $pos = strpos($file->path, $baseUrl);
+                    if ($baseUrl !== '/' && $pos === false) {
+                        $file->path = $baseUrl === '/' ? $file->path : $baseUrl . '/' . $file->path;
+                    }
                     $files->push($file);
                 }
             }
@@ -185,18 +213,18 @@ class FileManagerService
     /**
      * Upload a file on current folder.
      *
-     * @param $file
+     * @param $filePath
      * @param $currentFolder
-     * @param $forceSlug
+     * @param $fileName
+     * @param $extension
      *
      * @return  mixed
      */
-    public function uploadFile($file, $currentFolder, $forceSlug = false)
+    public function uploadFile($filePath, $currentFolder, $fileName, $extension)
     {
-        $fileName = $this->checkFileExists($currentFolder, $file, $forceSlug = false);
-
-        if ($this->storage->putFileAs($currentFolder, $file, $fileName)) {
-            $this->setVisibility($currentFolder, $fileName);
+        $file = new File($filePath);
+        if ($this->storage->putFileAs($currentFolder, $file, $fileName . '.' . $extension)) {
+            $this->setVisibility($currentFolder, $fileName . '.' . $extension);
             return $fileName;
         } else {
             return false;
@@ -300,6 +328,63 @@ class FileManagerService
         }
     }
 
+    public function renameFolder($path, $name)
+    {
+        try {
+            //HACK
+            $pathWithoutName = $this::getFilePathWithoutName($path);
+            $newPath = $pathWithoutName;
+            $newPath .= $pathWithoutName === '/' ? $name . 'hackfix' : '/' . $name . 'hackfix';
+            $this->storage->move($path, $newPath);
+
+            $hackPath = $newPath;
+            $newPath = $pathWithoutName;
+            $newPath .= $pathWithoutName === '/' ? $name : '/' . $name;
+            $this->storage->move($hackPath, $newPath);
+            return true;
+        } catch (\Exception $exception) {
+            return false;
+        }
+    }
+
+    public function exists($file)
+    {
+        return $this->storage->exists($file);
+    }
+
+    /**
+     * Exist in BDD ?
+     *
+     * @param $name
+     * @param $extension
+     * @param $path
+     * @return bool
+     */
+    public function existInDB($name, $extension, $path = null)
+    {
+        $query = Media::where('name', 'LIKE', $name)->where('extension', $extension);
+        if($path) {
+            $query->where('path', $path);
+        }
+        $media = $query->first();
+        return !!$media;
+    }
+
+    /**
+     * Exist in BDD with another path ?
+     *
+     * @param $name
+     * @param $extension
+     * @param $path
+     * @return bool
+     */
+    public function existInDBWithAnotherPath($name, $extension, $path)
+    {
+        $query = Media::where('name', $name)->where('extension', $extension)->where('path', 'NOT LIKE', $path);
+        $media = $query->first();
+        return !!$media;
+    }
+
     /**
      * Get filename without extension
      * @param $fileName
@@ -352,5 +437,24 @@ class FileManagerService
         if(!count($exploded)) { return '/'; }
         array_pop($exploded);
         return implode('/', $exploded);
+    }
+
+    /**
+     * get a filepath for file
+     *
+     * @param $name
+     * @param $path
+     * @param $extension
+     * @return string
+     */
+    static function getFullPathFile($name, $path, $extension)
+    {
+        $fullpath = '';
+        if ($path !== '/') {
+            $fullpath .= $path.'/';
+        }
+        $fullpath .= $name.'.'.$extension;
+
+        return $fullpath;
     }
 }
