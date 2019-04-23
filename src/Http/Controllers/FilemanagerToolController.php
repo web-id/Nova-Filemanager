@@ -149,7 +149,7 @@ class FilemanagerToolController extends Controller
         unset($data['path']);
         unset($data['extension']);
         if($file) {
-            if($this->service->existInDB($request->name, $file->extension)) {
+            if($data['name'] !== $file->name && $this->service->existInDB($request->name, $file->extension)) {
                 return response()->json([
                     'message'   => 'Name already taken.'
                 ], 500);
