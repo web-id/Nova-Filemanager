@@ -56,9 +56,6 @@ class Install extends Command
         $this->info(" Webid\\".$this->moduleName." installation started. Please wait...");
         $provider = "WebId\Filemanager\FilemanagerServiceProvider";
 
-        $this->line(' Publishing migrations');
-        $this->publish('migrations', $provider);
-
         $this->line(' Publishing tests');
         $this->publish('tests', $provider);
 
