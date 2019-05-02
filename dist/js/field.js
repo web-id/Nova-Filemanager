@@ -29911,13 +29911,29 @@ function updateLink (link, options, obj) {
 function urlCDNCrop(image, sizeX, sizeY) {
     var token = 'ayso32m5n';
     var urlSite = window.location.origin;
-    return 'https://' + token + '.cloudimg.io/crop/' + sizeX + 'x' + sizeY + '/x/' + urlSite + '/' + 'storage/' + image;
+    var realImage = urlSite;
+    if (image.startsWith("/storage")) {
+        realImage += image;
+    } else if (image.startsWith("storage")) {
+        realImage += '/' + image;
+    } else {
+        realImage += '/' + 'storage/' + image;
+    }
+    return 'https://' + token + '.cloudimg.io/crop/' + sizeX + 'x' + sizeY + '/x/' + realImage;
 }
 
 function urlCDNResize(image, type, size) {
     var token = 'ayso32m5n';
     var urlSite = window.location.origin;
-    return 'https://' + token + '.cloudimg.io/' + type + '/' + size + '/x/' + urlSite + '/' + 'storage/' + image;
+    var realImage = urlSite;
+    if (image.startsWith("/storage")) {
+        realImage += image;
+    } else if (image.startsWith("storage")) {
+        realImage += '/' + image;
+    } else {
+        realImage += '/' + 'storage/' + image;
+    }
+    return 'https://' + token + '.cloudimg.io/' + type + '/' + size + '/x/' + realImage;
 }
 
 /***/ }),
@@ -45563,7 +45579,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     mounted: function mounted() {
         var newImage = new Image();
-        newImage.src = Object(__WEBPACK_IMPORTED_MODULE_1__settings__["b" /* urlCDNResize */])(this.file.fullpath, 'width', 470);
+        newImage.src = Object(__WEBPACK_IMPORTED_MODULE_1__settings__["b" /* urlCDNResize */])(this.file.path, 'width', 470);
         newImage.className = 'image block w-full self-center';
         newImage.draggable = false;
         this.$refs.imageDiv.appendChild(newImage);
@@ -60514,7 +60530,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         if (this.file.mime == 'image') {
             //defaulImage
             var imageDiv = document.createElement('div');
-            imageDiv.style.backgroundImage = "url('" + Object(__WEBPACK_IMPORTED_MODULE_0__settings__["a" /* urlCDNCrop */])(this.file.fullpath, 205, 205) + "')";
+            imageDiv.style.backgroundImage = "url('" + Object(__WEBPACK_IMPORTED_MODULE_0__settings__["a" /* urlCDNCrop */])(this.file.thumb, 205, 205) + "')";
             imageDiv.className = 'block w-full h-full bg-center bg-cover h-2/3';
             imageDiv.draggable = false;
             this.$refs.image.appendChild(imageDiv);
