@@ -61,7 +61,7 @@ export default {
         if (this.file.mime == 'image') {
             //defaulImage
             let imageDiv = document.createElement('div');
-            imageDiv.style.backgroundImage = "url('" + urlCDNCrop(this.file.fullpath, 205, 205) + "')";
+            imageDiv.style.backgroundImage = "url('" + urlCDNCrop(this.file.thumb, 205, 205) + "')";
             imageDiv.className = 'block w-full h-full bg-center bg-cover h-2/3';
             imageDiv.draggable = false;
             this.$refs.image.appendChild(imageDiv);

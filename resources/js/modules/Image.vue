@@ -57,7 +57,7 @@ export default {
 
     mounted() {
         let newImage = new Image();
-        newImage.src = urlCDNResize(this.file.fullpath, 'width', 470);
+        newImage.src = urlCDNResize(this.file.path, 'width', 470);
         newImage.className = 'image block w-full self-center';
         newImage.draggable = false;
         this.$refs.imageDiv.appendChild(newImage);
