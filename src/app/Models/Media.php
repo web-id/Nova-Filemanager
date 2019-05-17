@@ -3,11 +3,12 @@
 namespace WebId\Filemanager\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
 class Media extends Model
 {
-    use HasTranslations;
+    use HasTranslations, LogsActivity;
 
     /**
      * The table associated with the model.
@@ -23,11 +24,14 @@ class Media extends Model
      */
     protected $fillable = ['name', 'extension', 'alt', 'path'];
 
+    protected static $logAttributes = ['name', 'extension', 'alt', 'path'];
+
     protected $appends = ['fullpath'];
 
-    public function getFullpathAttribute() {
+    public function getFullpathAttribute()
+    {
         $fullpath = '';
-        if($this->attributes['path'] !== '/') {
+        if ($this->attributes['path'] !== '/') {
             $fullpath .= $this->attributes['path'] . '/';
         }
         $fullpath .= $this->attributes['name'] . '.' . $this->attributes['extension'];
