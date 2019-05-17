@@ -3,6 +3,7 @@
 namespace WebId\Filemanager\App\Repositories;
 
 use App\Repositories\BaseRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use WebId\Filemanager\App\Models\Media;
 use WebId\Filemanager\App\Repositories\Contracts\MediaRepositoryContract;
 use WebId\Filemanager\Http\Services\FileManagerService;
@@ -80,7 +81,13 @@ class MediaRepository extends BaseRepository implements MediaRepositoryContract
      * @return mixed
      */
     public function update(int $id, array $data) {
-        return $this->model->where('id', '=', $id)->update($data);
+        try {
+            $model = $this->find($id);
+            return $model->update($data);
+        }
+        catch (ModelNotFoundException $exception) {
+            return 0;
+        }
     }
 
     /**
