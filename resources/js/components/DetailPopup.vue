@@ -170,6 +170,7 @@ import { copy } from 'v-copy';
 import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
 import { codemirror } from 'vue-codemirror';
+import { cloneDeep } from 'lodash';
 
 //themes
 import 'codemirror/lib/codemirror.css';
@@ -270,7 +271,8 @@ export default {
 
         updateFilePopup() {
             this.closePreview();
-            return api.updateFile(this.vModelFile).then(result => {
+            let temp = cloneDeep(this.vModelFile);
+            return api.updateFile(temp).then(result => {
                 if (result == true) {
                     this.$toasted.show(this.__('File updated successfully'), { type: 'success' });
                     this.$emit('refresh');
