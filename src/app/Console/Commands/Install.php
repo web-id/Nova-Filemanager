@@ -59,9 +59,6 @@ class Install extends Command
         $this->line(' Publishing tests');
         $this->publish('tests', $provider);
 
-        $this->line(" Migrate ModuleFileManager table(s) (using Laravel's default migrations)");
-        $this->executeProcess('php artisan migrate');
-
         $this->progressBar->finish();
         $this->toggleModule(true);
         $this->info(" Webid\\".$this->moduleName." installation finished.");
