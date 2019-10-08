@@ -31,7 +31,7 @@ class FilemanagerServiceProvider extends ServiceProvider
     {
         $this->setPublishes(__DIR__);
 
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'nova-filemanager');
+        //$this->loadViewsFrom(__DIR__.'/../resources/views', 'nova-filemanager');
 
         $this->app->booted(function () {
             $this->routes();
